@@ -12,18 +12,12 @@ interface CreateExtractedTextExamModalProps {
 }
 
 interface FormData {
-  title: string;
-  content: string;
-  // add other form fields as needed
+  questionType: string
+  difficultyLevel: string
+  numQuestions: string
 }
 
 const FREE_TIER_DAILY_LIMIT = 5;
-
-// Replace 'any' with a proper type
-type ExtractedTextData = {
-  text: string;
-  // Add other properties as needed
-};
 
 const CreateExtractedTextExamModal = ({ 
   isOpen, 
@@ -34,19 +28,28 @@ const CreateExtractedTextExamModal = ({
 }: CreateExtractedTextExamModalProps) => {
   const router = useRouter()
   const [formData, setFormData] = useState<FormData>({
-    title: '',
-    content: ''
+    questionType: '',
+    difficultyLevel: '',
+    numQuestions: ''
   })
   const [errors, setErrors] = useState<Partial<FormData>>({})
 
   const validateForm = () => {
     const newErrors: Partial<FormData> = {}
 
-    if (!formData.title) {
-      newErrors.title = 'Title is required'
+    if (!formData.questionType) {
+      newErrors.questionType = 'Question type is required'
     }
-    if (!formData.content) {
-      newErrors.content = 'Content is required'
+    if (!formData.difficultyLevel) {
+      newErrors.difficultyLevel = 'Difficulty level is required'
+    }
+    if (!formData.numQuestions) {
+      newErrors.numQuestions = 'Number of questions is required'
+    } else {
+      const num = parseInt(formData.numQuestions)
+      if (num < 5 || num > 15) {
+        newErrors.numQuestions = 'Number of questions must be between 5 and 15'
+      }
     }
 
     setErrors(newErrors)
@@ -56,9 +59,10 @@ const CreateExtractedTextExamModal = ({
   const handleSubmit = () => {
     if (validateForm()) {
       const payload = {
-        title: formData.title,
-        content: formData.content,
-        // add other form fields as needed
+        questionType: formData.questionType,
+        difficultyLevel: formData.difficultyLevel,
+        numQuestions: parseInt(formData.numQuestions),
+        textContent: extractedText
       }
 
       try {
@@ -70,7 +74,7 @@ const CreateExtractedTextExamModal = ({
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
@@ -128,34 +132,61 @@ const CreateExtractedTextExamModal = ({
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Title <span className="text-red-500">*</span>
+              Question Type <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
+            <select
+              name="questionType"
+              value={formData.questionType}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-md p-2 text-gray-800"
               required
-            />
-            {errors.title && (
-              <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+            >
+              <option value="">Select question type</option>
+              <option value="objective">Objective</option>
+              <option value="descriptive">Descriptive</option>
+            </select>
+            {errors.questionType && (
+              <p className="text-red-500 text-sm mt-1">{errors.questionType}</p>
             )}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Content <span className="text-red-500">*</span>
+              Difficulty Level <span className="text-red-500">*</span>
             </label>
-            <textarea
-              name="content"
-              value={formData.content}
+            <select
+              name="difficultyLevel"
+              value={formData.difficultyLevel}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-md p-2 text-gray-800"
               required
+            >
+              <option value="">Select difficulty level</option>
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="expert">Expert</option>
+              </select>
+            {errors.difficultyLevel && (
+              <p className="text-red-500 text-sm mt-1">{errors.difficultyLevel}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Number of Questions <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              name="numQuestions"
+              value={formData.numQuestions}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-md p-2 text-gray-800"
+              min="5"
+              max="15"
+              required
             />
-            {errors.content && (
-              <p className="text-red-500 text-sm mt-1">{errors.content}</p>
+            {errors.numQuestions && (
+              <p className="text-red-500 text-sm mt-1">{errors.numQuestions}</p>
             )}
           </div>
         </div>
