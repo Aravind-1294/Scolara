@@ -1,6 +1,5 @@
 // components/ExamDisplay.tsx
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface Question {
   question: string;
@@ -14,6 +13,7 @@ interface Question {
 interface ExamDisplayProps {
   questions: Question[];
 }
+
 
 const ExamDisplay = ({ questions }: ExamDisplayProps) => {
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});

@@ -7,7 +7,16 @@ declare global {
   }
 }
 
-export async function extractText(file: File): Promise<string> {
+interface ExtractedResult {
+  text: string;
+  metadata?: {
+    pageCount?: number;
+    author?: string;
+    // Add other potential metadata fields
+  };
+}
+
+export async function extractText(file: File | Blob): Promise<string> {
   return new Promise(async (resolve, reject) => {
     try {
       if (file.type === 'text/plain') {
@@ -38,7 +47,7 @@ export async function extractText(file: File): Promise<string> {
   });
 }
 
-async function extractWithOCR(file: File): Promise<string> {
+async function extractWithOCR(file: File | Blob): Promise<string> {
   const worker = await createWorker('eng');
   try {
     const imageUrl = URL.createObjectURL(file);
@@ -50,7 +59,7 @@ async function extractWithOCR(file: File): Promise<string> {
   }
 }
 
-async function extractFromPdf(file: File): Promise<string> {
+async function extractFromPdf(file: File | Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     loadPdfJs()
       .then(async () => {
@@ -97,4 +106,8 @@ function loadPdfJs(): Promise<void> {
     script.onerror = () => reject(new Error('Failed to load PDF.js'));
     document.head.appendChild(script);
   });
+}
+
+function processExtractedData(data: ExtractedResult): string {
+  return data.text;
 }

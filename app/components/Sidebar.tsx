@@ -26,6 +26,13 @@ interface SidebarProps {
   setActiveTab: (tab: string) => void
 }
 
+interface MenuItem {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  path?: string;
+}
+
 const sidebarOptions: SidebarOption[] = [
   // Main navigation
   { id: 'general', name: 'General', icon: HomeIcon },

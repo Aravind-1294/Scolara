@@ -11,3 +11,15 @@ export interface ExamQuestion {
     questions: ExamQuestion[];
     status: string;
   }
+
+  export interface MenuItem {
+    id: string;
+    label: string;
+    icon: React.ReactNode;
+    path?: string;
+  }
+  
+  export interface ExtractedResult {
+    text: string;
+    metadata?: Record<string, unknown>;
+  } 

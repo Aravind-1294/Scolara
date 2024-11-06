@@ -32,7 +32,7 @@ interface FileError {
 
 export default function ChatDashboard() {
   const [isCreating, setIsCreating] = useState(false);
-  const [chatBots, setChatBots] = useState<ChatBotData[]>([]);
+  const [chatBots] = useState<ChatBotData[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [fileErrors, setFileErrors] = useState<FileError[]>([]);

@@ -1,8 +1,7 @@
 "use client"
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from './Sidebar'
-import Image from 'next/image'
 import FileUploader from './FileUploader'
 import { extractText } from '../utils/textExtractor'
 import CreateGeneralExamModal from './CreateGeneralExamModal'
@@ -27,6 +26,11 @@ interface ExamData {
   topics: string
   difficultyLevel: string
   numQuestions: string
+}
+
+interface ExamQuestion {
+  question_type?: string;
+  [key: string]: any;  // Allows for other properties
 }
 
 const supabase = createClient(
@@ -158,10 +162,12 @@ const ExamCard = ({
 };
 
 interface DashboardProps {
-  // define any props here
+  // Add required props here
+  userId?: string;
+  // If truly no props are needed, you can remove the interface entirely
 }
 
-export default function Dashboard(props: DashboardProps) {
+export default function Dashboard() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('general')
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
@@ -183,14 +189,7 @@ export default function Dashboard(props: DashboardProps) {
     lastResetDate: new Date().toDateString()
   });
 
-  useEffect(() => {
-    if (user?.emailAddresses?.[0]?.emailAddress) {
-      fetchPastExams();
-      fetchExamCount();
-    }
-  }, [user]);
-
-  const fetchPastExams = async () => {
+  const fetchPastExams = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('exam_results')
@@ -203,11 +202,10 @@ export default function Dashboard(props: DashboardProps) {
     } catch (error) {
       console.error('Error fetching past exams:', error);
     }
-  };
+  }, [user?.emailAddresses]);
 
-  const fetchExamCount = async () => {
+  const fetchExamCount = useCallback(async () => {
     try {
-      // Get today's date at midnight
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
 
@@ -219,7 +217,6 @@ export default function Dashboard(props: DashboardProps) {
 
       if (error) throw error;
 
-      // Update daily exam limit
       setDailyExamLimit({
         count: data.length,
         lastResetDate: startOfDay.toDateString()
@@ -228,7 +225,14 @@ export default function Dashboard(props: DashboardProps) {
     } catch (error) {
       console.error('Error fetching exam count:', error);
     }
-  };
+  }, [user?.emailAddresses]);
+
+  useEffect(() => {
+    if (user?.emailAddresses?.[0]?.emailAddress) {
+      fetchExamCount();
+      fetchPastExams();
+    }
+  }, [user, fetchExamCount, fetchPastExams]);
 
   const handleExamClick = async (examId: string) => {
     try {
@@ -277,7 +281,7 @@ export default function Dashboard(props: DashboardProps) {
           : responseData.data;
         
         // Add question_type if not present
-        const processedData = examData.map((question: any) => ({
+        const processedData = examData.map((question: ExamQuestion) => ({
           ...question,
           question_type: question.question_type || 'descriptive'
         }))
