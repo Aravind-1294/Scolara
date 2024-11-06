@@ -19,6 +19,12 @@ interface FormData {
 
 const FREE_TIER_DAILY_LIMIT = 5;
 
+// Replace 'any' with a proper type
+type ExtractedTextData = {
+  text: string;
+  // Add other properties as needed
+};
+
 const CreateExtractedTextExamModal = ({ 
   isOpen, 
   onClose, 

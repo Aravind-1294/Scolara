@@ -3,8 +3,26 @@ import { createWorker } from 'tesseract.js';
 
 declare global {
   interface Window {
-    pdfjsLib: any;
+    pdfjsLib: PdfJsLib;
   }
+}
+
+interface PdfJsLib {
+  getDocument: (options: { data: ArrayBuffer }) => { promise: Promise<PdfDocument> };
+  GlobalWorkerOptions: { workerSrc: string };
+}
+
+interface PdfDocument {
+  numPages: number;
+  getPage: (pageNum: number) => Promise<PdfPage>;
+}
+
+interface PdfPage {
+  getTextContent: () => Promise<PdfTextContent>;
+}
+
+interface PdfTextContent {
+  items: Array<{ str: string }>;
 }
 
 interface ExtractedResult {
@@ -73,7 +91,7 @@ async function extractFromPdf(file: File | Blob): Promise<string> {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
             const pageText = textContent.items
-              .map((item: any) => item.str)
+              .map((item: { str: string }) => item.str)
               .join(' ');
             fullText += pageText + '\n';
           }
@@ -106,8 +124,4 @@ function loadPdfJs(): Promise<void> {
     script.onerror = () => reject(new Error('Failed to load PDF.js'));
     document.head.appendChild(script);
   });
-}
-
-function processExtractedData(data: ExtractedResult): string {
-  return data.text;
 }
