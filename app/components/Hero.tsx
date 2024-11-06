@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 
 export default function Hero() {
   const [text, setText] = useState("Smarter");
-  const [isTyping, setIsTyping] = useState(true);
   const [showCursor, setShowCursor] = useState(true);
 
   useEffect(() => {

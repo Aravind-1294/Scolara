@@ -1,18 +1,15 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { 
   HomeIcon, 
   SparklesIcon, 
-  BeakerIcon,
   BellIcon, 
-  UserCircleIcon, 
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
   ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline'
-import Link from 'next/link'
-import clsx from 'clsx'
 import { UserButton, useUser, useClerk } from "@clerk/nextjs";
+import clsx from 'clsx'
 
 interface SidebarOption {
   id: string
@@ -73,6 +70,7 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         </div>
         <button
           onClick={handleNotificationClick}
+          
           className="p-1 hover:bg-gray-100 rounded-full transition-colors duration-200 relative"
         >
           <BellIcon className="w-6 h-6 text-gray-600" />
