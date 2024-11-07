@@ -245,6 +245,14 @@ export default function ExamDisplayPage() {
     testConnection();
   }, []);
 
+  useEffect(() => {
+    if (examData) {
+      examData.forEach((question, index) => {
+        console.log(`Question ${index + 1} options:`, question.options);
+      });
+    }
+  }, [examData]);
+
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
@@ -339,7 +347,7 @@ export default function ExamDisplayPage() {
                                 ${isWrong ? 'text-red-700' : ''}
                                 ${!isSubmitted ? 'text-gray-700' : ''}
                               `}>
-                                {optionLetter}. {option}
+                                {optionLetter}. {option.replace(/^[A-D]\.\s*/, '')}
                               </span>
                             </div>
                             {isSubmitted && isCorrect && (
