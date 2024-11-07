@@ -31,6 +31,7 @@ export default function ExamDisplayPage() {
   const [descriptiveAnswers, setDescriptiveAnswers] = useState<{[key: number]: string}>({})
   const { user } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [viewingFromDashboard, setViewingFromDashboard] = useState(false);
 
   useEffect(() => {
     console.log('Current examData:', examData)
@@ -92,20 +93,40 @@ export default function ExamDisplayPage() {
   }, [examData])
 
   useEffect(() => {
-    // Check if we're viewing results
+    // Check if we're viewing results and where we're viewing from
     const searchParams = new URLSearchParams(window.location.search);
+    const isFromDashboard = searchParams.get('from') === 'dashboard';
+    setViewingFromDashboard(isFromDashboard);
+    
     if (searchParams.get('view') === 'results') {
       setIsSubmitted(true);
       
-      // Load saved answers
-      const savedAnswers = localStorage.getItem('userAnswers');
-      if (savedAnswers) {
-        const parsed = JSON.parse(savedAnswers);
-        setUserAnswers(parsed.objective || {});
-        setDescriptiveAnswers(parsed.descriptive || {});
+      // Only load saved answers if NOT viewing from dashboard
+      if (!isFromDashboard) {
+        const savedAnswers = localStorage.getItem('userAnswers');
+        if (savedAnswers) {
+          const parsed = JSON.parse(savedAnswers);
+          setUserAnswers(parsed.objective || {});
+          setDescriptiveAnswers(parsed.descriptive || {});
+          
+          // Calculate and set score only for non-dashboard views
+          if (examData) {
+            let correctCount = 0;
+            examData.forEach((question, index) => {
+              if (question.question_type === 'objective' && question.options) {
+                const userAnswer = parsed.objective[index];
+                const correctLetter = getCorrectOptionLetter(question, question.options);
+                if (userAnswer === correctLetter) {
+                  correctCount++;
+                }
+              }
+            });
+            setScore(correctCount);
+          }
+        }
       }
     }
-  }, []);
+  }, [examData]);
 
   const getCorrectOptionLetter = (question: Question, options: string[]): string => {
     if (!question || !question.correct_option || !options) {
@@ -245,14 +266,6 @@ export default function ExamDisplayPage() {
     testConnection();
   }, []);
 
-  useEffect(() => {
-    if (examData) {
-      examData.forEach((question, index) => {
-        console.log(`Question ${index + 1} options:`, question.options);
-      });
-    }
-  }, [examData]);
-
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
@@ -281,7 +294,7 @@ export default function ExamDisplayPage() {
           <h1 className="text-3xl font-bold text-gray-900">
             {isSubmitted ? 'Exam Results' : 'Exam'}
           </h1>
-          {isSubmitted && (
+          {isSubmitted && !viewingFromDashboard && score > 0 && (
             <div className="text-xl font-semibold text-blue-600">
               Score: {score}/{examData?.filter(q => q.question_type === 'objective').length || 0}
             </div>
@@ -347,7 +360,7 @@ export default function ExamDisplayPage() {
                                 ${isWrong ? 'text-red-700' : ''}
                                 ${!isSubmitted ? 'text-gray-700' : ''}
                               `}>
-                                {optionLetter}. {option.replace(/^[A-D]\.\s*/, '')}
+                                {optionLetter}. {option}
                               </span>
                             </div>
                             {isSubmitted && isCorrect && (
