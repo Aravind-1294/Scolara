@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import Link from 'next/link'
 import Counter from './Counter';
 import { useState, useEffect } from 'react';
 
@@ -161,6 +162,7 @@ export default function Hero() {
               transition={{ duration: 0.8, delay: 0.7 }}
               className="flex flex-col sm:flex-row justify-center gap-4"
             >
+              <Link href="/Dashboard">
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -169,6 +171,7 @@ export default function Hero() {
                 <span className="relative z-10">Start Learning Free</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
               </motion.button>
+              </Link>
               
               <motion.button 
                 whileHover={{ scale: 1.05 }}
