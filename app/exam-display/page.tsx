@@ -365,7 +365,7 @@ export default function ExamDisplayPage() {
                                 ${isWrong ? 'text-red-700' : ''}
                                 ${!isSubmitted ? 'text-gray-700' : ''}
                               `}>
-                                {optionLetter}. {option}
+                                {optionLetter}. {option.replace(/^[A-D]\.\s*/, '')}
                               </span>
                             </div>
                             {isSubmitted && isCorrect && (
