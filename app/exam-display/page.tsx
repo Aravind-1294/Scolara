@@ -266,6 +266,11 @@ export default function ExamDisplayPage() {
     testConnection();
   }, []);
 
+  // Add a helper function to check if exam has any objective questions
+  const hasObjectiveQuestions = (questions: Question[] | null): boolean => {
+    return questions?.some(q => q.question_type === 'objective') ?? false;
+  }
+
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
@@ -294,7 +299,7 @@ export default function ExamDisplayPage() {
           <h1 className="text-3xl font-bold text-gray-900">
             {isSubmitted ? 'Exam Results' : 'Exam'}
           </h1>
-          {isSubmitted && !viewingFromDashboard && score > 0 && (
+          {isSubmitted && !viewingFromDashboard && hasObjectiveQuestions(examData) && score > 0 && (
             <div className="text-xl font-semibold text-blue-600">
               Score: {score}/{examData?.filter(q => q.question_type === 'objective').length || 0}
             </div>
