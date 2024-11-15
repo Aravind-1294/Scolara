@@ -45,7 +45,7 @@ export default function Navbar() {
               whileHover={{ scale: 1.05 }}
               className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent cursor-pointer"
             >
-              Scolara
+              Scholara
             </motion.div>
           </Link>
 
