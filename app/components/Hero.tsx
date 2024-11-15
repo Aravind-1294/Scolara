@@ -4,32 +4,9 @@ import Link from 'next/link'
 import Counter from './Counter';
 import { useState, useEffect } from 'react';
 
-function ArcadeEmbed() {
-  return (
-    <div style={{ position: 'relative', paddingBottom: 'calc(52.21621621621622% + 41px)', height: 0, width: '100%' }}>
-      <iframe
-        src="https://demo.arcade.software/IToYenC4c9DettGRIPg6?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true"
-        title="Scolara - AI-Powered Education Platform"
-        frameBorder="0"
-        loading="lazy"
-        allowFullScreen
-        allow="clipboard-write"
-        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', colorScheme: 'light' }}
-      />
-    </div>
-  )
-}
-
 export default function Hero() {
   const [text, setText] = useState("Smarter");
   const [showCursor, setShowCursor] = useState(true);
-  const [showDemo, setShowDemo] = useState(false);
-
-  const handleOutsideClick = (e) => {
-    if (e.target.classList.contains('modal-overlay')) {
-      setShowDemo(false);
-    }
-  };
 
   useEffect(() => {
     const words = ["Smarter", "Clever"];
@@ -186,21 +163,20 @@ export default function Hero() {
               className="flex flex-col sm:flex-row justify-center gap-4"
             >
               <Link href="/Dashboard">
-                <motion.button 
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-lg shadow-lg shadow-blue-200/50 relative overflow-hidden"
-                >
-                  <span className="relative z-10">Start Learning Free</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </motion.button>
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-lg shadow-lg shadow-blue-200/50 relative overflow-hidden"
+              >
+                <span className="relative z-10">Start Learning Free</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </motion.button>
               </Link>
               
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="px-8 py-4 border-2 border-transparent bg-white/80 backdrop-blur-sm rounded-xl text-lg relative group"
-                onClick={() => setShowDemo(true)}
               >
                 <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Watch Demo
@@ -240,18 +216,6 @@ export default function Hero() {
           </motion.div>
         </div>
       </div>
-
-      {/* Demo Modal */}
-      {showDemo && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 modal-overlay"
-          onClick={handleOutsideClick}
-        >
-          <div className="bg-white rounded-2xl w-full max-w-6xl p-4 relative">
-            <ArcadeEmbed />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
