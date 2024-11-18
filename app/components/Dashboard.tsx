@@ -447,7 +447,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div className="space-y-4 md:space-y-6 p-4 md:p-6 my-4 md:my-10">
+        <div className="space-y-4 md:space-y-6 p-4 md:p-6 my-4 md:my-10 pt-16 md:pt-4">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 md:px-4 md:py-3 rounded-lg text-sm md:text-base">
               {error}
