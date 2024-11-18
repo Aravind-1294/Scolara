@@ -70,7 +70,6 @@ const ExamCard = ({
     return 'text-red-600';
   };
 
-  // Format the date in a consistent way that doesn't depend on user's locale
   const formattedDate = useMemo(() => {
     const date = new Date(exam.created_at);
     return new Intl.DateTimeFormat('en-US', {
@@ -88,29 +87,29 @@ const ExamCard = ({
       onClick={() => onExamClick(exam.id)}
       className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 overflow-hidden cursor-pointer group"
     >
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <div className="flex justify-between items-start">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-2">
+              <h3 className="font-semibold text-gray-800 text-sm md:text-base group-hover:text-blue-600 transition-colors">
                 {exam.exam_title}
               </h3>
               {hasValidScore ? (
-                <span className="px-2 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded-full">
+                <span className="inline-block px-2 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded-full w-fit">
                   Objective
                 </span>
               ) : (
-                <span className="px-2 py-1 bg-purple-50 text-purple-600 text-xs font-medium rounded-full">
+                <span className="inline-block px-2 py-1 bg-purple-50 text-purple-600 text-xs font-medium rounded-full w-fit">
                   Descriptive
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs md:text-sm text-gray-500">
               {formattedDate}
             </p>
           </div>
           {hasValidScore && (
-            <div className={`font-bold text-lg ${getScoreColor(scorePercentage)}`}>
+            <div className={`font-bold text-base md:text-lg ${getScoreColor(scorePercentage)}`}>
               {scorePercentage.toFixed(0)}%
             </div>
           )}
@@ -118,10 +117,10 @@ const ExamCard = ({
         
         {hasValidScore && (
           <>
-            <div className="mt-4">
-              <div className="w-full bg-gray-100 rounded-full h-2.5">
+            <div className="mt-3 md:mt-4">
+              <div className="w-full bg-gray-100 rounded-full h-2">
                 <div
-                  className={`h-2.5 rounded-full ${
+                  className={`h-2 rounded-full ${
                     scorePercentage >= 80 ? 'bg-green-500' :
                     scorePercentage >= 60 ? 'bg-blue-500' :
                     scorePercentage >= 40 ? 'bg-yellow-500' :
@@ -132,13 +131,13 @@ const ExamCard = ({
               </div>
             </div>
 
-            <div className="mt-4 flex items-center justify-between text-sm">
+            <div className="mt-3 md:mt-4 flex items-center justify-between text-xs md:text-sm">
               <span className="text-gray-600">
                 Score: {exam.score}/{exam.total_questions}
               </span>
               <span className="text-blue-600 group-hover:translate-x-1 transition-transform duration-200 flex items-center gap-1">
                 View Details
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </span>
@@ -147,10 +146,10 @@ const ExamCard = ({
         )}
 
         {!hasValidScore && (
-          <div className="mt-4 flex items-center justify-end text-sm">
+          <div className="mt-3 md:mt-4 flex items-center justify-end text-xs md:text-sm">
             <span className="text-blue-600 group-hover:translate-x-1 transition-transform duration-200 flex items-center gap-1">
               View Details
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </span>
@@ -433,40 +432,40 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen">
-      <div className="w-64 fixed h-full">
+    <div className="flex flex-col md:flex-row h-screen">
+      <div className="w-full md:w-64 md:fixed h-auto md:h-full">
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
 
-      <main className="flex-1 ml-64 overflow-y-auto bg-gray-50">
+      <main className="flex-1 md:ml-64 overflow-y-auto bg-gray-50">
         {isLoading && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-700">Please wait while we create your exam...</p>
+            <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg text-center max-w-[90%] md:max-w-md mx-auto">
+              <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-sm md:text-base text-gray-700">Please wait while we create your exam...</p>
             </div>
           </div>
         )}
 
-        <div className="space-y-6 p-6 my-10">
+        <div className="space-y-4 md:space-y-6 p-4 md:p-6 my-4 md:my-10">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 md:px-4 md:py-3 rounded-lg text-sm md:text-base">
               {error}
             </div>
           )}
 
           {activeTab === 'general' && (
-            <div className="p-8">
-              <div className="flex justify-between items-center mb-8">
+            <div className="p-4 md:p-8">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 md:gap-8 mb-6 md:mb-8">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">Your Tests</h1>
-                  <p className="text-gray-600 mt-1">View and manage your exam results</p>
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Your Tests</h1>
+                  <p className="text-sm md:text-base text-gray-600 mt-1">View and manage your exam results</p>
                 </div>
                 <button
                   onClick={handleCreateExamClick}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2 shadow-sm"
+                  className="w-full md:w-auto bg-blue-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center md:justify-start space-x-2 shadow-sm text-sm md:text-base"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                   <span>Create Exam</span>
@@ -474,22 +473,22 @@ export default function Dashboard() {
               </div>
 
               {pastExams.length === 0 ? (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-12">
                   <div className="text-center">
-                    <div className="mx-auto w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-4">
-                      <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="mx-auto w-16 h-16 md:w-24 md:h-24 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                      <svg className="w-8 h-8 md:w-12 md:h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Tests Created Yet</h3>
-                    <p className="text-gray-500 mb-6">
+                    <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">No Tests Created Yet</h3>
+                    <p className="text-sm md:text-base text-gray-500 mb-6">
                       Start by creating your first exam to track your progress
                     </p>
                     <button
                       onClick={() => setIsGeneralModalOpen(true)}
-                      className="inline-flex items-center px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                      className="inline-flex items-center px-3 py-2 md:px-4 md:py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-sm md:text-base"
                     >
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
                       Create Your First Exam
@@ -497,7 +496,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {pastExams.map((exam) => (
                     <ExamCard 
                       key={exam.id} 
@@ -511,11 +510,11 @@ export default function Dashboard() {
           )}
 
           {activeTab === 'generate' && (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
+            <div className="space-y-4 md:space-y-6">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">Extract Text from File</h1>
-                  <p className="text-gray-600 mt-1">Upload a document to create custom exam questions from its content</p>
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Extract Text from File</h1>
+                  <p className="text-sm md:text-base text-gray-600 mt-1">Upload a document to create custom exam questions from its content</p>
                 </div>
                 <button
                   onClick={handleGenerateExamClick}
@@ -524,16 +523,16 @@ export default function Dashboard() {
                     !extractedText || isLoading
                       ? 'bg-gray-400 cursor-not-allowed'
                       : 'bg-blue-600 hover:bg-blue-700'
-                  } text-white px-6 py-3 rounded-lg font-medium transition-colors`}
+                  } w-full md:w-auto text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-medium transition-colors text-sm md:text-base`}
                 >
                   Create Exam
                 </button>
               </div>
 
               {examCount >= FREE_TIER_EXAM_LIMIT && (
-                <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg">
+                <div className="bg-amber-50 border border-amber-200 text-amber-800 px-3 py-2 md:px-4 md:py-3 rounded-lg text-sm md:text-base">
                   <div className="flex items-center">
-                    <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-4 w-4 md:h-5 md:w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <p>You have reached the maximum number of exams allowed in the free tier. Please upgrade to create more exams.</p>
@@ -541,7 +540,7 @@ export default function Dashboard() {
                 </div>
               )}
 
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
                 <div className="space-y-4">
                   <div className="max-w-xl mx-auto">
                     <FileUploader onFileSelect={handleFileSelect} />
@@ -549,9 +548,9 @@ export default function Dashboard() {
 
                   {uploadedFile && (
                     <div className="max-w-xl mx-auto mt-4">
-                      <div className="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="flex-shrink-0 mr-3">
-                          <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex items-center p-2 md:p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex-shrink-0 mr-2 md:mr-3">
+                          <svg className="h-5 w-5 md:h-6 md:w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                         </div>
@@ -565,7 +564,7 @@ export default function Dashboard() {
                         </div>
                         {isExtracting && (
                           <div className="ml-4">
-                            <svg className="animate-spin h-5 w-5 text-blue-600" viewBox="0 0 24 24">
+                            <svg className="animate-spin h-4 w-4 md:h-5 md:w-5 text-blue-600" viewBox="0 0 24 24">
                               <circle
                                 className="opacity-25"
                                 cx="12"
@@ -589,16 +588,16 @@ export default function Dashboard() {
 
                   {extractError && (
                     <div className="max-w-xl mx-auto">
-                      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="text-red-600 text-sm">{extractError}</p>
+                      <div className="p-3 md:p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-red-600 text-sm md:text-base">{extractError}</p>
                       </div>
                     </div>
                   )}
 
                   {extractedText && (
-                    <div className="mt-6 space-y-4">
+                    <div className="mt-4 md:mt-6 space-y-4">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-medium text-gray-900">
+                        <h3 className="text-base md:text-lg font-medium text-gray-900">
                           Extracted Text
                         </h3>
                         <button
