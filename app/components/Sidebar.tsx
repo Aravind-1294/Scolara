@@ -8,7 +8,7 @@ import {
   ArrowRightOnRectangleIcon,
   ChatBubbleLeftRightIcon,
   ChevronLeftIcon,
-  ChevronRightIcon,
+  ArrowLeftIcon,
   Bars3Icon,
   XMarkIcon
 } from '@heroicons/react/24/outline'
@@ -61,8 +61,27 @@ const sidebarOptions: SidebarOption[] = [
 export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const [showNotification, setShowNotification] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const { user } = useUser();
   const { openUserProfile, signOut } = useClerk();
+
+  // Update navigation history when activeTab changes
+  useEffect(() => {
+    if (activeTab !== navigationHistory[navigationHistory.length - 1]) {
+      setNavigationHistory(prev => [...prev, activeTab]);
+    }
+  }, [activeTab]);
+
+  // Handle back button click
+  const handleBackNavigation = () => {
+    if (activeTab === 'general') {
+      // If on general page, go to landing page
+      window.location.href = '/';
+    } else {
+      // If on any other feature, go to general page
+      setActiveTab('general');
+    }
+  };
 
   // Handle window resize
   useEffect(() => {
@@ -96,28 +115,46 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   return (
     <>
       {/* Mobile Menu Button */}
-      <button
-        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-white shadow-md"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-      >
-        {isMobileMenuOpen ? (
-          <XMarkIcon className="w-6 h-6" />
-        ) : (
-          <Bars3Icon className="w-6 h-6" />
+      <div className="md:hidden fixed top-4 left-4 z-50 flex items-center gap-2">
+        <button
+          className="p-2 rounded-md bg-white shadow-md"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? (
+            <XMarkIcon className="w-6 h-6" />
+          ) : (
+            <Bars3Icon className="w-6 h-6" />
+          )}
+        </button>
+        {activeTab !== 'general' && (
+          <button
+            className="p-2 rounded-md bg-white shadow-md"
+            onClick={handleBackNavigation}
+          >
+            <ArrowLeftIcon className="w-6 h-6" />
+          </button>
         )}
-      </button>
+      </div>
 
       <MobileOverlay />
 
       <div className={clsx(
         "fixed md:relative flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300",
         "z-50 md:z-auto",
-        "md:w-64", // Always full width on desktop
-        isMobileMenuOpen ? "w-64 left-0" : "-left-64 md:left-0", // Mobile sliding animation
-        "md:transform-none" // Disable transform on desktop
+        "md:w-64",
+        isMobileMenuOpen ? "w-64 left-0" : "-left-64 md:left-0",
+        "md:transform-none"
       )}>
         {/* Logo/Header */}
         <div className="p-4 border-b border-gray-200 flex justify-between items-center relative">
+          {activeTab !== 'general' && (
+            <button
+              onClick={handleBackNavigation}
+              className="p-1 hover:bg-gray-100 rounded-full transition-colors duration-200"
+            >
+              <ArrowLeftIcon className="w-6 h-6 text-gray-600" />
+            </button>
+          )}
           <div className="flex items-center">
             <h1 className="text-xl font-bold text-black">Scholora</h1>
             <span className="ml-2 text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-600">

@@ -167,8 +167,9 @@ interface DashboardProps {
 }
 
 export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState('general');
+  const [lastTab, setLastTab] = useState<string | null>(null);
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState('general')
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [extractedText, setExtractedText] = useState<string>('')
   const [isExtracting, setIsExtracting] = useState(false)
@@ -431,10 +432,49 @@ export default function Dashboard() {
     );
   };
 
+  // Handle browser back button
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state?.tab) {
+        setActiveTab(event.state.tab);
+      } else if (activeTab !== 'general') {
+        // If there's no state and we're not on general, go to general first
+        event.preventDefault();
+        setActiveTab('general');
+        window.history.pushState({ tab: 'general' }, '', window.location.pathname);
+      } else {
+        // If we're on general, let the default navigation happen (to landing page)
+        router.push('/');
+      }
+    };
+
+    // Initial history state
+    if (activeTab !== 'general') {
+      window.history.replaceState({ tab: activeTab }, '', window.location.pathname);
+    }
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activeTab, router]);
+
+  // Update history when tab changes
+  useEffect(() => {
+    if (activeTab !== lastTab) {
+      if (activeTab !== 'general') {
+        window.history.pushState({ tab: activeTab }, '', window.location.pathname);
+      }
+      setLastTab(activeTab);
+    }
+  }, [activeTab, lastTab]);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
+
   return (
     <div className="flex flex-col md:flex-row h-screen">
       <div className="w-full md:w-64 md:fixed h-auto md:h-full">
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <Sidebar activeTab={activeTab} setActiveTab={handleTabChange} />
       </div>
 
       <main className="flex-1 md:ml-64 overflow-y-auto bg-gray-50">
