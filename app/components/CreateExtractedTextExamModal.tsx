@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface CreateExtractedTextExamModalProps {
@@ -27,12 +27,29 @@ const CreateExtractedTextExamModal = ({
   examCount = 0 
 }: CreateExtractedTextExamModalProps) => {
   const router = useRouter()
+  const modalRef = useRef<HTMLDivElement>(null)
   const [formData, setFormData] = useState<FormData>({
-    questionType: '',
+    questionType: 'objective', // Default value
     difficultyLevel: '',
-    numQuestions: ''
+    numQuestions: '5' // Default value
   })
   const [errors, setErrors] = useState<Partial<FormData>>({})
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        onClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen, onClose])
 
   const validateForm = () => {
     const newErrors: Partial<FormData> = {}
@@ -98,7 +115,7 @@ const CreateExtractedTextExamModal = ({
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8 w-full max-w-md">
+        <div ref={modalRef} className="bg-white rounded-lg p-8 w-full max-w-md">
           <h2 className="text-2xl font-bold mb-4 text-gray-800">Daily Limit Reached</h2>
           <p className="text-gray-600 mb-4">
             You have reached the maximum number of exams ({FREE_TIER_DAILY_LIMIT}) allowed per day in the free tier.
@@ -123,7 +140,7 @@ const CreateExtractedTextExamModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 w-full max-w-md">
+      <div ref={modalRef} className="bg-white rounded-lg p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold mb-2 text-gray-800">Generate Questions from Text</h2>
         <p className="text-gray-600 text-sm mb-6">
           Create customized questions from your uploaded text. Select the question type, difficulty level, and number of questions you'd like to generate.
@@ -141,7 +158,6 @@ const CreateExtractedTextExamModal = ({
               className="w-full border border-gray-300 rounded-md p-2 text-gray-800"
               required
             >
-              <option value="">Select question type</option>
               <option value="objective">Objective</option>
               <option value="descriptive">Descriptive</option>
             </select>
@@ -165,7 +181,7 @@ const CreateExtractedTextExamModal = ({
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="expert">Expert</option>
-              </select>
+            </select>
             {errors.difficultyLevel && (
               <p className="text-red-500 text-sm mt-1">{errors.difficultyLevel}</p>
             )}

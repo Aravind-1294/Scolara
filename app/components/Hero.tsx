@@ -51,12 +51,12 @@ export default function Hero() {
       let typeSpeed = isDeleting ? 100 : 200;
 
       if (!isDeleting && currentText === currentWord) {
-        typeSpeed = 2000; // Pause at end of word
+        typeSpeed = 2000;
         isDeleting = true;
       } else if (isDeleting && currentText === "") {
         isDeleting = false;
         currentIndex = (currentIndex + 1) % words.length;
-        typeSpeed = 500; // Pause before starting new word
+        typeSpeed = 500;
       }
 
       setTimeout(type, typeSpeed);
@@ -64,7 +64,6 @@ export default function Hero() {
 
     type();
 
-    // Cursor blinking effect
     const cursorInterval = setInterval(() => {
       setShowCursor(prev => !prev);
     }, 530);
@@ -84,7 +83,7 @@ export default function Hero() {
   };
 
   return (
-    <div className="h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Animated Gradient Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(59,130,246,0.1),transparent_50%),radial-gradient(circle_at_bottom_left,_rgba(147,51,234,0.1),transparent_50%)]" />
@@ -118,7 +117,7 @@ export default function Hero() {
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute top-1/4 right-1/4 w-16 h-16 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl backdrop-blur-sm border border-white/20"
+          className="absolute top-1/4 right-1/4 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl backdrop-blur-sm border border-white/20"
         />
         <motion.div
           animate={{
@@ -131,12 +130,12 @@ export default function Hero() {
             repeat: Infinity,
             ease: "linear",
           }}
-          className="absolute bottom-1/4 left-1/4 w-20 h-20 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full backdrop-blur-sm border border-white/20"
+          className="absolute bottom-1/4 left-1/4 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full backdrop-blur-sm border border-white/20"
         />
       </div>
 
       {/* Content */}
-      <div className="relative h-full flex items-center">
+      <div className="relative min-h-screen flex items-center py-12 md:py-0">
         <div className="container mx-auto px-4">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -144,19 +143,18 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="max-w-4xl mx-auto text-center"
           >
-            {/* Gradient Border Decoration */}
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: "6rem" }}
               transition={{ duration: 1, delay: 0.5 }}
-              className="h-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mx-auto mb-8"
+              className="h-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mx-auto mb-6 md:mb-8"
             />
 
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-6xl md:text-7xl font-bold mb-6 leading-tight"
+              className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 md:mb-6 leading-tight px-4"
             >
               <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Learn {text}
@@ -173,23 +171,23 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-xl md:text-2xl text-gray-600 mb-12 leading-relaxed"
+              className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 md:mb-12 leading-relaxed px-4"
             >
               Transform your learning journey with AI-generated questions,
-              <br className="hidden md:block" /> instant insights, and personalized guidance.
+              <br className="hidden sm:block" /> instant insights, and personalized guidance.
             </motion.p>
 
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.7 }}
-              className="flex flex-col sm:flex-row justify-center gap-4"
+              className="flex flex-col sm:flex-row justify-center gap-4 px-4"
             >
-              <Link href="/Dashboard">
+              <Link href="/Dashboard" className="w-full sm:w-auto">
                 <motion.button 
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-lg shadow-lg shadow-blue-200/50 relative overflow-hidden"
+                  className="w-full sm:w-auto group px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-lg shadow-lg shadow-blue-200/50 relative overflow-hidden"
                 >
                   <span className="relative z-10">Start Learning Free</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -199,7 +197,7 @@ export default function Hero() {
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 border-2 border-transparent bg-white/80 backdrop-blur-sm rounded-xl text-lg relative group"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-2 border-transparent bg-white/80 backdrop-blur-sm rounded-xl text-lg relative group"
                 onClick={() => setShowDemo(true)}
               >
                 <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -214,7 +212,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.9 }}
-              className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto"
+              className="mt-12 md:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-8 max-w-2xl mx-auto px-4"
             >
               {[
                 { value: 10000, label: "Students", suffix: "+" },
@@ -224,9 +222,9 @@ export default function Hero() {
                 <motion.div
                   key={index}
                   whileHover={{ y: -5 }}
-                  className="text-center p-6 rounded-2xl bg-white/50 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300"
+                  className="text-center p-4 md:p-6 rounded-2xl bg-white/50 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300"
                 >
-                  <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                     <Counter 
                       end={stat.value} 
                       duration={2000}

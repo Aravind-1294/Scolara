@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 interface CreateExamModalProps {
   isOpen: boolean
@@ -17,15 +17,32 @@ export interface ExamData {
 }
 
 const CreateExamModal = ({ isOpen, onClose, onSubmit, examCount = 0 }: CreateExamModalProps) => {
+  const modalRef = useRef<HTMLDivElement>(null)
   const [formData, setFormData] = useState<ExamData>({
-    questionType: '',
+    questionType: 'objective', // Default value
     topics: '',
     difficultyLevel: '',
-    numQuestions: ''
+    numQuestions: '5' // Default value
   })
   const [errors, setErrors] = useState<Partial<ExamData>>({})
 
   const FREE_TIER_DAILY_LIMIT = 5;
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        onClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen, onClose])
 
   if (examCount >= FREE_TIER_DAILY_LIMIT) {
     const resetTime = new Date();
@@ -37,7 +54,7 @@ const CreateExamModal = ({ isOpen, onClose, onSubmit, examCount = 0 }: CreateExa
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8 w-full max-w-md">
+        <div ref={modalRef} className="bg-white rounded-lg p-8 w-full max-w-md">
           <h2 className="text-2xl font-bold mb-4 text-gray-800">Daily Limit Reached</h2>
           <p className="text-gray-600 mb-4">
             You have reached the maximum number of exams ({FREE_TIER_DAILY_LIMIT}) allowed per day in the free tier.
@@ -88,10 +105,10 @@ const CreateExamModal = ({ isOpen, onClose, onSubmit, examCount = 0 }: CreateExa
       onSubmit(formData)
       onClose()
       setFormData({
-        questionType: '',
+        questionType: 'objective',
         topics: '',
         difficultyLevel: '',
-        numQuestions: ''
+        numQuestions: '5'
       })
     }
   }
@@ -114,7 +131,7 @@ const CreateExamModal = ({ isOpen, onClose, onSubmit, examCount = 0 }: CreateExa
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 w-full max-w-md">
+      <div ref={modalRef} className="bg-white rounded-lg p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Create New Exam</h2>
 
         <div className="space-y-4">
@@ -129,7 +146,6 @@ const CreateExamModal = ({ isOpen, onClose, onSubmit, examCount = 0 }: CreateExa
               className="w-full border border-gray-300 rounded-md p-2 text-gray-800"
               required
             >
-              <option value="">Select question type</option>
               <option value="objective">Objective</option>
               <option value="descriptive">Descriptive</option>
             </select>
