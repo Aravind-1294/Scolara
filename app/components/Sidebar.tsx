@@ -60,7 +60,6 @@ const sidebarOptions: SidebarOption[] = [
 
 export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const [showNotification, setShowNotification] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useUser();
   const { openUserProfile, signOut } = useClerk();
@@ -113,51 +112,28 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       <div className={clsx(
         "fixed md:relative flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300",
         "z-50 md:z-auto",
-        isCollapsed ? "md:w-20" : "md:w-64",
+        "md:w-64", // Always full width on desktop
         isMobileMenuOpen ? "w-64 left-0" : "-left-64 md:left-0", // Mobile sliding animation
         "md:transform-none" // Disable transform on desktop
       )}>
-        {/* Collapse Toggle Button - Only show on desktop */}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden md:block absolute -right-3 top-1/2 transform -translate-y-1/2 
-            bg-white border border-gray-200 rounded-full p-1 shadow-md
-            hover:bg-gray-50 z-10"
-        >
-          {isCollapsed ? (
-            <ChevronRightIcon className="w-4 h-4" />
-          ) : (
-            <ChevronLeftIcon className="w-4 h-4" />
-          )}
-        </button>
-
         {/* Logo/Header */}
         <div className="p-4 border-b border-gray-200 flex justify-between items-center relative">
-          {(!isCollapsed || isMobileMenuOpen) && (
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-black">Scholora</h1>
-              <span className="ml-2 text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-600">
-                BETA
-              </span>
-            </div>
-          )}
-          {isCollapsed && !isMobileMenuOpen && (
-            <div className="w-full flex justify-center">
-              <span className="font-bold text-xl">S</span>
-            </div>
-          )}
-          {(!isCollapsed || isMobileMenuOpen) && (
-            <button
-              onClick={handleNotificationClick}
-              className="p-1 hover:bg-gray-100 rounded-full transition-colors duration-200 relative"
-            >
-              <BellIcon className="w-6 h-6 text-gray-600" />
-              <span className="absolute top-0 right-0 h-2.5 w-2.5 bg-red-500 rounded-full"></span>
-            </button>
-          )}
+          <div className="flex items-center">
+            <h1 className="text-xl font-bold text-black">Scholora</h1>
+            <span className="ml-2 text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-600">
+              BETA
+            </span>
+          </div>
+          <button
+            onClick={handleNotificationClick}
+            className="p-1 hover:bg-gray-100 rounded-full transition-colors duration-200 relative"
+          >
+            <BellIcon className="w-6 h-6 text-gray-600" />
+            <span className="absolute top-0 right-0 h-2.5 w-2.5 bg-red-500 rounded-full"></span>
+          </button>
 
           {/* Notification Popup */}
-          {showNotification && (!isCollapsed || isMobileMenuOpen) && (
+          {showNotification && (
             <div className="absolute top-full -right-48 mt-2 bg-white shadow-lg rounded-lg p-4 border border-gray-200 w-64 z-50">
               <div className="absolute -top-2 right-52 w-4 h-4 bg-white border-t border-l border-gray-200 transform rotate-45"></div>
               <p className="text-gray-600">No notifications/updates as of now</p>
@@ -185,19 +161,14 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                   'text-gray-400 cursor-not-allowed': option.disabled
                 }
               )}
-              title={isCollapsed && !isMobileMenuOpen ? option.name : undefined}
             >
               <option.icon className="w-5 h-5" />
-              {(!isCollapsed || isMobileMenuOpen) && (
-                <>
-                  <span className="ml-3">{option.name}</span>
-                  {option.tag && (
-                    <span className="ml-auto text-xs px-2.5 py-0.5 rounded-full font-medium
-                      bg-purple-100 text-purple-600">
-                      {option.tag}
-                    </span>
-                  )}
-                </>
+              <span className="ml-3">{option.name}</span>
+              {option.tag && (
+                <span className="ml-auto text-xs px-2.5 py-0.5 rounded-full font-medium
+                  bg-purple-100 text-purple-600">
+                  {option.tag}
+                </span>
               )}
             </button>
           ))}
@@ -207,56 +178,32 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         <div className="border-t border-gray-200 py-4">
           <div className="relative w-full flex items-center px-4 py-3 text-gray-600">
             <UserButton afterSignOutUrl="/sign-in" />
-            {(!isCollapsed || isMobileMenuOpen) && (
-              <span className="ml-3 text-sm truncate">
-                {user?.emailAddresses[0]?.emailAddress || 'Loading...'}
-              </span>
-            )}
+            <span className="ml-3 text-sm truncate">
+              {user?.emailAddresses[0]?.emailAddress || 'Loading...'}
+            </span>
           </div>
 
-          {(!isCollapsed || isMobileMenuOpen) && (
-            <>
-              <button
-                onClick={() => {
-                  openUserProfile();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="relative w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 transition-colors duration-200"
-              >
-                <Cog6ToothIcon className="w-5 h-5 mr-3" />
-                <span>Settings</span>
-              </button>
+          <button
+            onClick={() => {
+              openUserProfile();
+              setIsMobileMenuOpen(false);
+            }}
+            className="relative w-full flex items-center px-4 py-3 text-gray-600 hover:bg-gray-50 transition-colors duration-200"
+          >
+            <Cog6ToothIcon className="w-5 h-5 mr-3" />
+            <span>Settings</span>
+          </button>
 
-              <button
-                onClick={() => {
-                  signOut();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="relative w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 transition-colors duration-200"
-              >
-                <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
-                <span>Sign Out</span>
-              </button>
-            </>
-          )}
-          {isCollapsed && !isMobileMenuOpen && (
-            <div className="flex flex-col items-center space-y-4">
-              <button
-                onClick={() => openUserProfile()}
-                className="p-2 hover:bg-gray-50 rounded-full"
-                title="Settings"
-              >
-                <Cog6ToothIcon className="w-5 h-5 text-gray-600" />
-              </button>
-              <button
-                onClick={() => signOut()}
-                className="p-2 hover:bg-red-50 rounded-full"
-                title="Sign Out"
-              >
-                <ArrowRightOnRectangleIcon className="w-5 h-5 text-red-600" />
-              </button>
-            </div>
-          )}
+          <button
+            onClick={() => {
+              signOut();
+              setIsMobileMenuOpen(false);
+            }}
+            className="relative w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 transition-colors duration-200"
+          >
+            <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </div>
     </>
