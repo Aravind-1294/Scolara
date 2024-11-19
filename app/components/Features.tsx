@@ -1,6 +1,6 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface Feature {
   title: string;
@@ -17,6 +17,20 @@ interface Feature {
 
 export default function Features() {
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+        setExpandedId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const features: Feature[] = [
     {
@@ -205,6 +219,7 @@ export default function Features() {
                 <motion.div
                   layoutId={`card-${expandedId}`}
                   className="w-full max-w-2xl"
+                  ref={cardRef}
                 >
                   <div className="bg-white rounded-2xl p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
                     <div className="relative">
