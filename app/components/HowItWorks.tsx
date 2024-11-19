@@ -114,7 +114,7 @@ export default function HowItWorks() {
           >
             <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-80 group-hover:h-80 opacity-10"></span>
             <span className="relative inline-flex items-center gap-2 text-white text-lg font-semibold tracking-wider">
-              Get Started Now
+              <Link href="/sign-up">Get Started Now</Link>
               <svg 
                 className="w-5 h-5 transition-transform group-hover:translate-x-1" 
                 fill="none" 
