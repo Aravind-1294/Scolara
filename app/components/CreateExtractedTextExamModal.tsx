@@ -29,7 +29,7 @@ const CreateExtractedTextExamModal = ({
   const router = useRouter()
   const modalRef = useRef<HTMLDivElement>(null)
   const [formData, setFormData] = useState<FormData>({
-    questionType: 'objective', // Default value
+    questionType: 'mcq', // Default value
     difficultyLevel: '',
     numQuestions: '5' // Default value
   })
@@ -115,18 +115,18 @@ const CreateExtractedTextExamModal = ({
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div ref={modalRef} className="bg-white rounded-lg p-8 w-full max-w-md">
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">Daily Limit Reached</h2>
-          <p className="text-gray-600 mb-4">
+        <div ref={modalRef} className="bg-white dark:bg-gray-800 rounded-lg p-8 w-full max-w-md">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Daily Limit Reached</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
             You have reached the maximum number of exams ({FREE_TIER_DAILY_LIMIT}) allowed per day in the free tier.
           </p>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
             Your limit will reset in {hoursUntilReset}h {minutesUntilReset}m.
           </p>
           <div className="flex justify-end">
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600"
             >
               Close
             </button>
@@ -140,41 +140,44 @@ const CreateExtractedTextExamModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div ref={modalRef} className="bg-white rounded-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-2 text-gray-800">Generate Questions from Text</h2>
-        <p className="text-gray-600 text-sm mb-6">
+      <div ref={modalRef} className="bg-white dark:bg-gray-800 rounded-lg p-8 w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-100">Generate Questions from Text</h2>
+        <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
           Create customized questions from your uploaded text. Select the question type, difficulty level, and number of questions you'd like to generate.
         </p>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Question Type <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              Question Type <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <select
               name="questionType"
               value={formData.questionType}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-md p-2 text-gray-800"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-md p-2 text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-700"
               required
             >
-              <option value="objective">Objective</option>
-              <option value="descriptive">Descriptive</option>
+              <option value="mcq">MCQs</option>
+              <option value="true-false" disabled>True/False (Coming Soon)</option>
+              <option value="fill-blanks" disabled>Fill in the Blanks (Coming Soon)</option>
+              <option value="short-answer" disabled>Short Answers (Coming Soon)</option>
+              <option value="long-answer" disabled>Long Answers (Coming Soon)</option>
             </select>
             {errors.questionType && (
-              <p className="text-red-500 text-sm mt-1">{errors.questionType}</p>
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.questionType}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Difficulty Level <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              Difficulty Level <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <select
               name="difficultyLevel"
               value={formData.difficultyLevel}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-md p-2 text-gray-800"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-md p-2 text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-700"
               required
             >
               <option value="">Select difficulty level</option>
@@ -183,26 +186,26 @@ const CreateExtractedTextExamModal = ({
               <option value="expert">Expert</option>
             </select>
             {errors.difficultyLevel && (
-              <p className="text-red-500 text-sm mt-1">{errors.difficultyLevel}</p>
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.difficultyLevel}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Number of Questions <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              Number of Questions <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <input
               type="number"
               name="numQuestions"
               value={formData.numQuestions}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-md p-2 text-gray-800"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-md p-2 text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-700"
               min="5"
               max="15"
               required
             />
             {errors.numQuestions && (
-              <p className="text-red-500 text-sm mt-1">{errors.numQuestions}</p>
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">{errors.numQuestions}</p>
             )}
           </div>
         </div>
@@ -210,13 +213,13 @@ const CreateExtractedTextExamModal = ({
         <div className="mt-6 flex justify-end space-x-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600"
           >
             Generate Questions
           </button>

@@ -43,7 +43,6 @@ const ExamDisplay = ({ questions }: ExamDisplayProps) => {
               Question {index + 1}: {question.question}
             </h3>
             
-            {/* Always show textarea since these are descriptive questions */}
             <div className="mt-4">
               <textarea
                 value={answers[index] || ''}
@@ -67,7 +66,7 @@ const ExamDisplay = ({ questions }: ExamDisplayProps) => {
                   <pre className="whitespace-pre-wrap text-sm">
                     {JSON.stringify({
                       question: question.question,
-                      question_type: 'descriptive',
+                      question_type: 'mcq',
                       difficulty: question.difficulty
                     }, null, 2)}
                   </pre>

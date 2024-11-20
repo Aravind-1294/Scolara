@@ -6,7 +6,6 @@ export interface ExamResult {
   created_at: string;
   exam_data: unknown;
   user_answers: {
-    objective: { [key: number]: string };
-    descriptive: { [key: number]: string };
+    mcq: { [key: number]: string };
   };
 } 

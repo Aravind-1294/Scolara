@@ -43,7 +43,7 @@ export default function FileUploader({ onFileSelect }: FileUploaderProps) {
   return (
     <div
       className={`relative border-2 border-dashed rounded-lg p-8 ${
-        dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+        dragActive ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30' : 'border-gray-300 dark:border-gray-600'
       }`}
       onDragEnter={handleDrag}
       onDragLeave={handleDrag}
@@ -57,14 +57,14 @@ export default function FileUploader({ onFileSelect }: FileUploaderProps) {
         onChange={handleFileSelect}
       />
       <div className="text-center">
-        <CloudArrowUpIcon className="mx-auto h-12 w-12 text-gray-400" />
-        <p className="mt-4 text-lg font-medium text-gray-900">
+        <CloudArrowUpIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+        <p className="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">
           Drag and drop your file here
         </p>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           or click to select a file
         </p>
-        <p className="mt-2 text-xs text-gray-500">
+        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
           Supported formats: PDF, TXT, Images
         </p>
       </div>
