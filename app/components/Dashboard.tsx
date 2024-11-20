@@ -600,7 +600,7 @@ export default function Dashboard() {
                     <CardHeader className="p-4 sm:p-6">
                       <CardTitle className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Performance Trend</CardTitle>
                     </CardHeader>
-                    <CardContent className="p-2 sm:p-6 h-[300px] sm:h-[400px]">
+                    <CardContent className="p-2 sm:p-6">
                       <div className="mb-4 flex flex-wrap gap-2">
                         <button
                           onClick={() => setTimeFilter('all')}
@@ -643,61 +643,63 @@ export default function Dashboard() {
                           Today
                         </button>
                       </div>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={calculateAnalytics?.chartData || []} margin={{ 
-                          top: 20, 
-                          right: 10, 
-                          left: 0, 
-                          bottom: 40 
-                        }}>
-                          <CartesianGrid strokeDasharray="3 3" className="dark:stroke-gray-700" />
-                          <XAxis 
-                            dataKey="name" 
-                            tick={false}
-                            axisLine={{ stroke: '#E5E7EB' }}
-                          />
-                          <YAxis 
-                            tick={{ 
-                              fill: 'currentColor',
-                              fontSize: window.innerWidth < 640 ? 10 : 12 
-                            }}
-                            domain={[0, 100]}
-                            label={{ 
-                              value: 'Score (%)', 
-                              angle: -90,
-                              position: 'insideLeft',
-                              style: {
+                      <div className="h-[250px] sm:h-[400px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={calculateAnalytics?.chartData || []} margin={{ 
+                            top: 20, 
+                            right: 10, 
+                            left: 0, 
+                            bottom: 20 
+                          }}>
+                            <CartesianGrid strokeDasharray="3 3" className="dark:stroke-gray-700" />
+                            <XAxis 
+                              dataKey="name" 
+                              tick={false}
+                              axisLine={{ stroke: '#E5E7EB' }}
+                            />
+                            <YAxis 
+                              tick={{ 
                                 fill: 'currentColor',
-                                textAnchor: 'middle',
-                              }
-                            }}
-                            className="text-gray-600 dark:text-gray-300"
-                          />
-                          <Tooltip 
-                            cursor={false}
-                            contentStyle={{
-                              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                              border: 'none',
-                              borderRadius: '4px',
-                              padding: '8px'
-                            }}
-                            labelStyle={{ color: 'white' }}
-                            itemStyle={{ color: 'white' }}
-                          />
-                          <Bar dataKey="percentage">
-                            {(calculateAnalytics?.chartData || []).map((entry, index) => (
-                              <Cell 
-                                key={`cell-${index}`}
-                                fill={entry.percentage >= 80 ? '#22c55e' : 
-                                      entry.percentage >= 60 ? '#3b82f6' : 
-                                      entry.percentage >= 40 ? '#eab308' : 
-                                      '#ef4444'}
-                                className="dark:opacity-80"
-                              />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
+                                fontSize: window.innerWidth < 640 ? 10 : 12 
+                              }}
+                              domain={[0, 100]}
+                              label={{ 
+                                value: 'Score (%)', 
+                                angle: -90,
+                                position: 'insideLeft',
+                                style: {
+                                  fill: 'currentColor',
+                                  textAnchor: 'middle',
+                                }
+                              }}
+                              className="text-gray-600 dark:text-gray-300"
+                            />
+                            <Tooltip 
+                              cursor={false}
+                              contentStyle={{
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                border: 'none',
+                                borderRadius: '4px',
+                                padding: '8px'
+                              }}
+                              labelStyle={{ color: 'white' }}
+                              itemStyle={{ color: 'white' }}
+                            />
+                            <Bar dataKey="percentage">
+                              {(calculateAnalytics?.chartData || []).map((entry, index) => (
+                                <Cell 
+                                  key={`cell-${index}`}
+                                  fill={entry.percentage >= 80 ? '#22c55e' : 
+                                        entry.percentage >= 60 ? '#3b82f6' : 
+                                        entry.percentage >= 40 ? '#eab308' : 
+                                        '#ef4444'}
+                                  className="dark:opacity-80"
+                                />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
                     </CardContent>
                   </Card>
 
