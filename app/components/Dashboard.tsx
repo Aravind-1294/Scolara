@@ -541,8 +541,8 @@ export default function Dashboard() {
   }, [pastExams, timeFilter]);
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
-      <div className="w-full md:w-64 md:fixed h-auto md:h-full">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="w-full md:w-64 md:fixed md:inset-y-0 z-40">
         <Sidebar 
           activeTab={activeTab} 
           setActiveTab={handleTabChange}
@@ -550,31 +550,33 @@ export default function Dashboard() {
         />
       </div>
 
-      <main className="flex-1 md:ml-64 overflow-y-auto bg-gray-100 dark:bg-gray-900">
-        {isLoading && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-lg shadow-lg text-center max-w-[90%] md:max-w-md mx-auto">
-              <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-b-2 border-blue-600 dark:border-blue-700 mx-auto"></div>
-              <p className="mt-4 text-sm md:text-base text-gray-700 dark:text-gray-300">Please wait while we create your exam...</p>
+      <main className="flex-1 w-full md:ml-64">
+        <div className="min-h-screen pb-20 md:pb-0">
+          {isLoading && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-lg shadow-lg text-center max-w-[90%] md:max-w-md mx-auto">
+                <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-b-2 border-blue-600 dark:border-blue-700 mx-auto"></div>
+                <p className="mt-4 text-sm md:text-base text-gray-700 dark:text-gray-300">Please wait while we create your exam...</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="space-y-4 md:space-y-6 p-4 md:p-6 my-4 md:my-10 pt-16 md:pt-4">
           {error && (
-            <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-3 py-2 md:px-4 md:py-3 rounded-lg text-sm md:text-base">
-              {error}
+            <div className="mx-3 sm:mx-4 md:mx-6 mt-3 sm:mt-4 md:mt-6">
+              <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-3 py-2 md:px-4 md:py-3 rounded-lg text-sm md:text-base">
+                {error}
+              </div>
             </div>
           )}
 
           {activeTab === 'general' && (
-            <div className="p-4 md:p-8">
-              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
+            <div className="p-3 sm:p-4 md:p-6 space-y-4 mt-16 md:mt-0">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Your Performance</h1>
                   <p className="text-gray-600 dark:text-gray-400 mt-1">Track your progress and analyze your exam results</p>
                 </div>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   <button
                     onClick={handleCreateExamClick}
                     className="w-full sm:w-auto bg-gradient-to-r from-blue-600 dark:from-blue-700 to-blue-700 dark:to-blue-800 text-white px-6 py-2.5 rounded-full font-medium hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
@@ -584,72 +586,18 @@ export default function Dashboard() {
                     </svg>
                     Create Exam
                   </button>
-                  <Toggle 
+                  <Toggle
                     pressed={showAnalytics}
                     onPressedChange={setShowAnalytics}
-                    className="w-full sm:w-auto bg-white dark:bg-gray-800 border-2 border-blue-500 dark:border-blue-700 data-[state=on]:bg-blue-500 dark:data-[state=on]:bg-blue-700 data-[state=on]:text-white px-6 py-2 rounded-full shadow-sm hover:shadow-md transition-all duration-200 flex justify-center"
+                    className="w-full sm:w-auto bg-white dark:bg-gray-800 border-2 border-blue-500 dark:border-blue-700 data-[state=on]:bg-blue-500 dark:data-[state=on]:bg-blue-700 data-[state=on]:text-white px-6 py-2 rounded-full shadow-sm hover:shadow-md transition-all duration-200 flex justify-center items-center"
                   >
                     {showAnalytics ? 'View History' : 'View Analytics'}
                   </Toggle>
                 </div>
               </div>
-
               {showAnalytics ? (
-                <div className="space-y-6 sm:space-y-8">
-                  <div className="flex justify-center sm:justify-end px-4 sm:px-0">
-                    <Tabs defaultValue="all" value={timeFilter} onValueChange={setTimeFilter} className="w-full sm:w-auto">
-                      <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 sm:w-[400px]">
-                        <TabsTrigger value="all" className="text-xs sm:text-sm">All Time</TabsTrigger>
-                        <TabsTrigger value="month" className="text-xs sm:text-sm">This Month</TabsTrigger>
-                        <TabsTrigger value="week" className="text-xs sm:text-sm">This Week</TabsTrigger>
-                        <TabsTrigger value="today" className="text-xs sm:text-sm">Today</TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  </div>
-
-                  <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                    <Card className="bg-gradient-to-br from-blue-500 dark:from-blue-700 to-blue-600 dark:to-blue-800 text-white transform hover:scale-105 transition-transform duration-200">
-                      <CardHeader className="p-4 sm:p-6">
-                        <CardTitle className="text-base sm:text-lg font-medium opacity-80">Total Exams Taken</CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
-                        <div className="flex items-baseline space-x-2">
-                          <span className="text-3xl sm:text-4xl font-bold">{calculateAnalytics?.totalExams || 0}</span>
-                          <span className="text-sm sm:text-base text-blue-100 dark:text-blue-300">exams</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="bg-gradient-to-br from-purple-500 dark:from-purple-700 to-purple-600 dark:to-purple-800 text-white transform hover:scale-105 transition-transform duration-200">
-                      <CardHeader className="p-4 sm:p-6">
-                        <CardTitle className="text-base sm:text-lg font-medium opacity-80">Average Score</CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
-                        <div className="flex items-baseline space-x-2">
-                          <span className="text-3xl sm:text-4xl font-bold">{calculateAnalytics?.averagePercentage || 0}</span>
-                          <span className="text-sm sm:text-base text-purple-100 dark:text-purple-300">%</span>
-                        </div>
-                        <p className="text-xs sm:text-sm text-purple-100 dark:text-purple-300 mt-2">Overall performance</p>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="bg-gradient-to-br from-emerald-500 dark:from-emerald-700 to-emerald-600 dark:to-emerald-800 text-white transform hover:scale-105 transition-transform duration-200">
-                      <CardHeader className="p-4 sm:p-6">
-                        <CardTitle className="text-base sm:text-lg font-medium opacity-80">Latest Score</CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
-                        <div className="flex items-baseline space-x-2">
-                          <span className="text-3xl sm:text-4xl font-bold">
-                            {pastExams[0] ? ((pastExams[0].score / pastExams[0].total_questions) * 100).toFixed(1) : 0}
-                          </span>
-                          <span className="text-sm sm:text-base text-emerald-100 dark:text-emerald-300">%</span>
-                        </div>
-                        <p className="text-xs sm:text-sm text-emerald-100 dark:text-emerald-300 mt-2">Most recent exam</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  <Card className="bg-white dark:bg-gray-800 shadow-lg">
+                <div className="w-full p-2 sm:p-4 md:p-6">
+                  <Card className="w-full">
                     <CardHeader className="p-4 sm:p-6">
                       <CardTitle className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Performance Trend</CardTitle>
                     </CardHeader>
@@ -715,9 +663,51 @@ export default function Dashboard() {
                       </ResponsiveContainer>
                     </CardContent>
                   </Card>
+
+                  <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 p-2 sm:p-4">
+                    <Card className="bg-gradient-to-br from-blue-500 dark:from-blue-700 to-blue-600 dark:to-blue-800 text-white transform hover:scale-105 transition-transform duration-200">
+                      <CardHeader className="p-4 sm:p-6">
+                        <CardTitle className="text-base sm:text-lg font-medium opacity-80">Total Exams Taken</CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+                        <div className="flex items-baseline space-x-2">
+                          <span className="text-3xl sm:text-4xl font-bold">{calculateAnalytics?.totalExams || 0}</span>
+                          <span className="text-sm sm:text-base text-blue-100 dark:text-blue-300">exams</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-purple-500 dark:from-purple-700 to-purple-600 dark:to-purple-800 text-white transform hover:scale-105 transition-transform duration-200">
+                      <CardHeader className="p-4 sm:p-6">
+                        <CardTitle className="text-base sm:text-lg font-medium opacity-80">Average Score</CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+                        <div className="flex items-baseline space-x-2">
+                          <span className="text-3xl sm:text-4xl font-bold">{calculateAnalytics?.averagePercentage || 0}</span>
+                          <span className="text-sm sm:text-base text-purple-100 dark:text-purple-300">%</span>
+                        </div>
+                        <p className="text-xs sm:text-sm text-purple-100 dark:text-purple-300 mt-2">Overall performance</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-emerald-500 dark:from-emerald-700 to-emerald-600 dark:to-emerald-800 text-white transform hover:scale-105 transition-transform duration-200">
+                      <CardHeader className="p-4 sm:p-6">
+                        <CardTitle className="text-base sm:text-lg font-medium opacity-80">Latest Score</CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+                        <div className="flex items-baseline space-x-2">
+                          <span className="text-3xl sm:text-4xl font-bold">
+                            {pastExams[0] ? ((pastExams[0].score / pastExams[0].total_questions) * 100).toFixed(1) : 0}
+                          </span>
+                          <span className="text-sm sm:text-base text-emerald-100 dark:text-emerald-300">%</span>
+                        </div>
+                        <p className="text-xs sm:text-sm text-emerald-100 dark:text-emerald-300 mt-2">Most recent exam</p>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               ) : (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 p-2 sm:p-4">
                   {pastExams.map((exam) => (
                     <ExamCard
                       key={exam.id}
@@ -731,8 +721,8 @@ export default function Dashboard() {
           )}
 
           {activeTab === 'generate' && (
-            <div className="space-y-4 md:space-y-6 p-4 md:p-8">
-              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <div className="space-y-3 sm:space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6 mt-16 md:mt-0">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Extract Text from File</h1>
                   <p className="text-gray-600 dark:text-gray-400 mt-1">Upload a document to create custom exam questions from its content</p>
@@ -787,8 +777,8 @@ export default function Dashboard() {
                 </div>
               )}
 
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6">
-                <div className="space-y-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-4 md:p-6">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="max-w-xl mx-auto">
                     <FileUploader onFileSelect={handleFileSelect} />
                   </div>
@@ -841,7 +831,7 @@ export default function Dashboard() {
                   )}
 
                   {extractedText && (
-                    <div className="mt-4 md:mt-6 space-y-4">
+                    <div className="mt-3 sm:mt-4 md:mt-6 space-y-3 sm:space-y-4">
                       <div className="flex items-center justify-between">
                         <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-white">
                           Extracted Text
@@ -866,7 +856,7 @@ export default function Dashboard() {
                         )}
                       </div>
 
-                      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 max-h-96 overflow-y-auto">
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-gray-600 max-h-[calc(100vh-20rem)] overflow-y-auto">
                         <pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
                           {extractedText}
                         </pre>

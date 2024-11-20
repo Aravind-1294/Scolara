@@ -111,7 +111,7 @@ export default function Sidebar({ activeTab, setActiveTab, dailyExamLimit }: Sid
   const MobileOverlay = () => (
     <div 
       className={clsx(
-        "fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden",
+        "fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden",
         isMobileMenuOpen ? "block" : "hidden"
       )}
       onClick={() => setIsMobileMenuOpen(false)}
@@ -120,45 +120,46 @@ export default function Sidebar({ activeTab, setActiveTab, dailyExamLimit }: Sid
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <div className="md:hidden fixed top-4 left-4 z-50 flex items-center gap-2">
-        <button
-          className="p-2 rounded-md bg-white dark:bg-gray-800 shadow-md"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? (
-            <XMarkIcon className="w-6 h-6 dark:text-white" />
-          ) : (
-            <Bars3Icon className="w-6 h-6 dark:text-white" />
-          )}
-        </button>
-        {activeTab !== 'general' && (
-          <button
-            className="p-2 rounded-md bg-white dark:bg-gray-800 shadow-md"
-            onClick={handleBackNavigation}
-          >
-            <ArrowLeftIcon className="w-6 h-6 dark:text-white" />
-          </button>
-        )}
-      </div>
-
       <MobileOverlay />
+
+      {/* Mobile Menu Button */}
+      <div className={clsx(
+        "md:hidden fixed top-4 left-4 z-50",
+        isMobileMenuOpen ? "hidden" : "block"
+      )}>
+        <div className="flex items-center gap-2">
+          <button
+            className="p-2 rounded-md bg-white dark:bg-gray-800 shadow-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <Bars3Icon className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+          </button>
+          {activeTab !== 'general' && (
+            <button
+              className="p-2 rounded-md bg-white dark:bg-gray-800 shadow-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              onClick={handleBackNavigation}
+            >
+              <ArrowLeftIcon className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+            </button>
+          )}
+        </div>
+      </div>
 
       <div className={clsx(
         "fixed md:relative flex flex-col h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300",
-        "z-50 md:z-auto",
+        "z-40 md:z-auto",
         "md:w-64",
         isMobileMenuOpen ? "w-64 left-0" : "-left-64 md:left-0",
         "md:transform-none"
       )}>
         {/* Logo/Header */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center relative">
-          {activeTab !== 'general' && (
+          {isMobileMenuOpen && (
             <button
-              onClick={handleBackNavigation}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors duration-200 md:hidden"
             >
-              <ArrowLeftIcon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              <XMarkIcon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
             </button>
           )}
           <div className="flex items-center">
