@@ -194,7 +194,7 @@ export default function Dashboard() {
     count: 0,
     lastResetDate: new Date().toDateString()
   });
-  const [timeFilter, setTimeFilter] = useState('all');
+  const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
 
   const fetchPastExams = useCallback(async () => {
     try {
@@ -489,7 +489,7 @@ export default function Dashboard() {
 
     // Filter exams based on time period
     const now = new Date();
-    const filteredExams = pastExams.filter(exam => {
+    const filteredExams = timeFilter === 'all' ? pastExams : pastExams.filter(exam => {
       const examDate = new Date(exam.created_at);
       switch (timeFilter) {
         case 'today':
@@ -520,11 +520,10 @@ export default function Dashboard() {
     }
 
     const totalExams = validExams.length;
-    const totalScore = validExams.reduce((sum, exam) => {
-      const percentage = (exam.score / exam.total_questions) * 100;
-      return sum + percentage;
-    }, 0);
-    const averagePercentage = (totalScore / totalExams).toFixed(1);
+    const totalPercentage = validExams.reduce((sum, exam) => 
+      sum + (exam.score / exam.total_questions) * 100, 0
+    );
+    const averagePercentage = (totalPercentage / totalExams).toFixed(1);
 
     const chartData = validExams
       .map(exam => ({
@@ -602,6 +601,48 @@ export default function Dashboard() {
                       <CardTitle className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Performance Trend</CardTitle>
                     </CardHeader>
                     <CardContent className="p-2 sm:p-6 h-[300px] sm:h-[400px]">
+                      <div className="mb-4 flex flex-wrap gap-2">
+                        <button
+                          onClick={() => setTimeFilter('all')}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            timeFilter === 'all'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          Total Exams
+                        </button>
+                        <button
+                          onClick={() => setTimeFilter('month')}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            timeFilter === 'month'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          This Month
+                        </button>
+                        <button
+                          onClick={() => setTimeFilter('week')}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            timeFilter === 'week'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          This Week
+                        </button>
+                        <button
+                          onClick={() => setTimeFilter('today')}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            timeFilter === 'today'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          Today
+                        </button>
+                      </div>
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={calculateAnalytics?.chartData || []} margin={{ 
                           top: 20, 
@@ -612,15 +653,8 @@ export default function Dashboard() {
                           <CartesianGrid strokeDasharray="3 3" className="dark:stroke-gray-700" />
                           <XAxis 
                             dataKey="name" 
-                            angle={-45}
-                            textAnchor="end"
-                            height={70}
-                            tick={{ 
-                              fill: 'currentColor',
-                              fontSize: window.innerWidth < 640 ? 10 : 12 
-                            }}
-                            interval={0}
-                            className="text-gray-600 dark:text-gray-300"
+                            tick={false}
+                            axisLine={{ stroke: '#E5E7EB' }}
                           />
                           <YAxis 
                             tick={{ 
@@ -640,12 +674,15 @@ export default function Dashboard() {
                             className="text-gray-600 dark:text-gray-300"
                           />
                           <Tooltip 
+                            cursor={false}
                             contentStyle={{
-                              backgroundColor: 'rgb(31, 41, 55)',
+                              backgroundColor: 'rgba(0, 0, 0, 0.8)',
                               border: 'none',
-                              borderRadius: '0.375rem',
-                              color: 'rgb(209, 213, 219)'
+                              borderRadius: '4px',
+                              padding: '8px'
                             }}
+                            labelStyle={{ color: 'white' }}
+                            itemStyle={{ color: 'white' }}
                           />
                           <Bar dataKey="percentage">
                             {(calculateAnalytics?.chartData || []).map((entry, index) => (
@@ -739,19 +776,7 @@ export default function Dashboard() {
                   {isLoading ? (
                     <>
                       <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth={4}
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       Generating...
                     </>
