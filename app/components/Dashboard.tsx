@@ -200,14 +200,26 @@ export default function Dashboard() {
     try {
       const { data, error } = await supabase
         .from('exam_results')
-        .select('id, exam_title, score, total_questions, created_at')
+        .select('*')  // Select all fields to ensure we have complete data
         .eq('user_email', user?.emailAddresses?.[0]?.emailAddress)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPastExams(data || []);
+      
+      // Validate the data before setting it
+      const validExams = (data || []).filter(exam => 
+        exam && 
+        typeof exam.score === 'number' && 
+        typeof exam.total_questions === 'number' &&
+        exam.total_questions > 0 &&
+        exam.exam_title &&
+        exam.created_at
+      );
+      
+      setPastExams(validExams);
     } catch (error) {
       console.error('Error fetching past exams:', error);
+      setError('Failed to fetch exam data');
     }
   }, [user?.emailAddresses]);
 
@@ -439,6 +451,70 @@ export default function Dashboard() {
     );
   };
 
+  const calculateAnalytics = useMemo(() => {
+    try {
+      if (!pastExams || pastExams.length === 0) {
+        return {
+          totalExams: 0,
+          averagePercentage: "0.0",
+          chartData: []
+        };
+      }
+
+      // Filter exams based on time period
+      const now = new Date();
+      const filteredExams = timeFilter === 'all' ? pastExams : pastExams.filter(exam => {
+        const examDate = new Date(exam.created_at);
+        switch (timeFilter) {
+          case 'today':
+            return examDate.toDateString() === now.toDateString();
+          case 'week':
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            return examDate >= weekAgo;
+          case 'month':
+            const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+            return examDate >= monthAgo;
+          default:
+            return true;
+        }
+      });
+
+      const totalExams = filteredExams.length;
+      if (totalExams === 0) {
+        return {
+          totalExams: 0,
+          averagePercentage: "0.0",
+          chartData: []
+        };
+      }
+
+      const totalPercentage = filteredExams.reduce((sum, exam) => {
+        const score = (exam.score / exam.total_questions) * 100;
+        return sum + (isNaN(score) ? 0 : score);
+      }, 0);
+      
+      const averagePercentage = (totalPercentage / totalExams).toFixed(1);
+
+      const chartData = filteredExams.map(exam => ({
+        name: new Date(exam.created_at).toLocaleDateString(),
+        total: Number(((exam.score / exam.total_questions) * 100).toFixed(1))
+      }));
+
+      return {
+        totalExams,
+        averagePercentage,
+        chartData
+      };
+    } catch (error) {
+      console.error('Error calculating analytics:', error);
+      return {
+        totalExams: 0,
+        averagePercentage: "0.0",
+        chartData: []
+      };
+    }
+  }, [pastExams, timeFilter]);
+
   // Handle browser back button
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -477,67 +553,6 @@ export default function Dashboard() {
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
   };
-
-  const calculateAnalytics = useMemo(() => {
-    if (!pastExams || pastExams.length === 0) {
-      return {
-        totalExams: 0,
-        averagePercentage: "0.0",
-        chartData: []
-      };
-    }
-
-    // Filter exams based on time period
-    const now = new Date();
-    const filteredExams = timeFilter === 'all' ? pastExams : pastExams.filter(exam => {
-      const examDate = new Date(exam.created_at);
-      switch (timeFilter) {
-        case 'today':
-          return examDate.toDateString() === now.toDateString();
-        case 'week':
-          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          return examDate >= weekAgo;
-        case 'month':
-          const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-          return examDate >= monthAgo;
-        default:
-          return true;
-      }
-    });
-
-    const validExams = filteredExams.filter(exam => 
-      exam.score !== undefined && 
-      exam.total_questions !== undefined && 
-      exam.total_questions !== 0
-    );
-
-    if (validExams.length === 0) {
-      return {
-        totalExams: filteredExams.length,
-        averagePercentage: "0.0",
-        chartData: []
-      };
-    }
-
-    const totalExams = validExams.length;
-    const totalPercentage = validExams.reduce((sum, exam) => 
-      sum + (exam.score / exam.total_questions) * 100, 0
-    );
-    const averagePercentage = (totalPercentage / totalExams).toFixed(1);
-
-    const chartData = validExams
-      .map(exam => ({
-        name: exam.exam_title,
-        percentage: Number(((exam.score / exam.total_questions) * 100).toFixed(1))
-      }))
-      .reverse();
-
-    return {
-      totalExams,
-      averagePercentage,
-      chartData
-    };
-  }, [pastExams, timeFilter]);
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -685,13 +700,13 @@ export default function Dashboard() {
                               labelStyle={{ color: 'white' }}
                               itemStyle={{ color: 'white' }}
                             />
-                            <Bar dataKey="percentage">
+                            <Bar dataKey="total">
                               {(calculateAnalytics?.chartData || []).map((entry, index) => (
                                 <Cell 
                                   key={`cell-${index}`}
-                                  fill={entry.percentage >= 80 ? '#22c55e' : 
-                                        entry.percentage >= 60 ? '#3b82f6' : 
-                                        entry.percentage >= 40 ? '#eab308' : 
+                                  fill={entry.total >= 80 ? '#22c55e' : 
+                                        entry.total >= 60 ? '#3b82f6' : 
+                                        entry.total >= 40 ? '#eab308' : 
                                         '#ef4444'}
                                   className="dark:opacity-80"
                                 />
