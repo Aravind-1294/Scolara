@@ -133,22 +133,39 @@ export default function ExamDisplayPage() {
     }
 
     try {
+      // First try: direct letter match (A, B, C, D)
       if (question.correct_option.length === 1 && 
           question.correct_option >= 'A' && 
           question.correct_option <= 'D') {
         return question.correct_option;
       }
+
+      // Second try: match with option text (ignoring A., B., etc. prefixes)
+      const correctOption = question.correct_option.replace(/^[A-D]\.\s*/, '').trim();
+      const correctAnswerIndex = options.findIndex(option => 
+        option.replace(/^[A-D]\.\s*/, '').trim() === correctOption
+      );
       
-      const correctAnswerIndex = options.findIndex(option => option === question.correct_option);
-      if (correctAnswerIndex === -1) {
-        console.error('Could not find correct answer in options:', {
-          correctOption: question.correct_option,
-          options
-        });
-        return '';
+      if (correctAnswerIndex !== -1) {
+        return String.fromCharCode(65 + correctAnswerIndex);
       }
-      
-      return String.fromCharCode(65 + correctAnswerIndex);
+
+      // Third try: fuzzy match (ignoring case and whitespace)
+      const normalizedCorrectOption = correctOption.toLowerCase().replace(/\s+/g, '');
+      const fuzzyIndex = options.findIndex(option => 
+        option.replace(/^[A-D]\.\s*/, '').trim().toLowerCase().replace(/\s+/g, '') === normalizedCorrectOption
+      );
+
+      if (fuzzyIndex !== -1) {
+        return String.fromCharCode(65 + fuzzyIndex);
+      }
+
+      console.error('Could not find correct answer in options:', {
+        correctOption: question.correct_option,
+        normalizedCorrectOption,
+        options
+      });
+      return '';
     } catch (error) {
       console.error('Error in getCorrectOptionLetter:', error);
       return '';
