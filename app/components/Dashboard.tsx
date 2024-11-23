@@ -171,6 +171,74 @@ interface DashboardProps {
   // If truly no props are needed, you can remove the interface entirely
 }
 
+const formatExamData = (rawData: any) => {
+  try {
+    // First try to parse if it's a string
+    let parsedData = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
+    
+    // If it's still a string (double encoded), try parsing again
+    if (typeof parsedData === 'string') {
+      try {
+        parsedData = JSON.parse(parsedData);
+      } catch (e) {
+        // Try to extract JSON from text using regex
+        // Match anything that looks like a JSON array or object
+        const jsonRegex = /(\[[\s\S]*\]|\{[\s\S]*\})/;
+        const jsonMatch = parsedData.match(jsonRegex);
+        if (jsonMatch) {
+          try {
+            parsedData = JSON.parse(jsonMatch[0]);
+          } catch (parseError) {
+            console.error('Failed to parse extracted JSON:', parseError);
+            throw new Error('Invalid JSON format in response');
+          }
+        } else {
+          throw new Error('No valid JSON found in response');
+        }
+      }
+    }
+
+    // Ensure we have an array
+    const questions = Array.isArray(parsedData) ? parsedData : [parsedData];
+    
+    // Format and validate each question
+    const formattedData = questions.map(question => {
+      if (!question || typeof question !== 'object') {
+        throw new Error('Invalid question format');
+      }
+
+      // Ensure required fields exist
+      if (!question.question || !question.options || !question.correct_option) {
+        throw new Error('Missing required question fields');
+      }
+
+      // Ensure options is an array
+      const options = Array.isArray(question.options) 
+        ? question.options 
+        : typeof question.options === 'string'
+          ? JSON.parse(question.options)
+          : [];
+
+      if (!Array.isArray(options)) {
+        throw new Error('Invalid options format');
+      }
+
+      return {
+        question: String(question.question).trim(),
+        question_type: 'mcq',
+        options: options.map((opt: any) => String(opt).trim()),
+        correct_option: String(question.correct_option).trim(),
+        explanation: String(question.explanation || '').trim()
+      };
+    });
+
+    return formattedData;
+  } catch (error) {
+    console.error('Error formatting exam data:', error);
+    throw new Error(`Failed to format exam data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+};
+
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('general');
   const [showAnalytics, setShowAnalytics] = useState(false);
@@ -290,27 +358,30 @@ export default function Dashboard() {
         body: JSON.stringify(payload),
       })
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const responseData = await response.json()
       console.log('Raw API Response:', responseData)
 
-      if (responseData.success) {
-        // Check if responseData.data is already an object/array
-        const examData = typeof responseData.data === 'string' 
-          ? JSON.parse(responseData.data)
-          : responseData.data;
+      if (!responseData.success || !responseData.data) {
+        throw new Error(responseData.error || 'Invalid response format');
+      }
+
+      try {
+        const formattedData = formatExamData(responseData.data);
+        console.log('Formatted exam data:', formattedData);
         
-        // Add question_type if not present
-        const processedData = examData.map((question: ExamQuestion) => ({
-          ...question,
-          question_type: question.question_type || 'mcq'
-        }))
-        
-        // Store the processed data
-        localStorage.setItem('generatedExam', JSON.stringify(processedData))
+        if (!Array.isArray(formattedData) || formattedData.length === 0) {
+          throw new Error('No valid questions generated');
+        }
+
+        localStorage.setItem('generatedExam', JSON.stringify(formattedData))
         
         router.push('/exam-display')
-      } else {
-        throw new Error(responseData.error || 'Failed to generate exam')
+      } catch (formatError) {
+        throw new Error(`Failed to format exam data: ${formatError instanceof Error ? formatError.message : 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error details:', error)
@@ -335,6 +406,10 @@ export default function Dashboard() {
         numQuestions: parseInt(examData.numQuestions, 10)
       };
 
+      if (isNaN(payload.numQuestions)) {
+        throw new Error('Invalid number of questions');
+      }
+
       const response = await fetch('https://web-production-d90d4.up.railway.app/api/generate-general-exam', {
         method: 'POST',
         headers: {
@@ -343,21 +418,33 @@ export default function Dashboard() {
         body: JSON.stringify(payload),
       })
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json()
       console.log('API Response:', data)
 
-      if (data.success) {
-        const examData = data.data
-        console.log('Exam data to store:', examData)
+      if (!data.success || !data.data) {
+        throw new Error(data.error || 'Invalid response format');
+      }
+
+      try {
+        const formattedData = formatExamData(data.data);
+        console.log('Formatted exam data:', formattedData);
         
-        localStorage.setItem('generatedExam', JSON.stringify(examData))
+        if (!Array.isArray(formattedData) || formattedData.length === 0) {
+          throw new Error('No valid questions generated');
+        }
+
+        localStorage.setItem('generatedExam', JSON.stringify(formattedData))
         router.push('/exam-display')
-      } else {
-        throw new Error(data.error || 'Failed to create exam')
+      } catch (formatError) {
+        throw new Error(`Failed to format exam data: ${formatError instanceof Error ? formatError.message : 'Unknown error'}`);
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
       console.error('Error creating exam:', error)
+      setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
       setIsLoading(false)
     }

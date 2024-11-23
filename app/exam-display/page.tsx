@@ -49,38 +49,72 @@ export default function ExamDisplayPage() {
         return
       }
 
+      let parsedData;
       try {
-        const firstParse = JSON.parse(storedExam)
-        console.log('First parse:', firstParse)
+        // Try to parse the data
+        parsedData = JSON.parse(storedExam)
         
-        const parsedData = typeof firstParse === 'string' ? JSON.parse(firstParse) : firstParse
-        console.log('Final parsed data:', parsedData)
+        // If it's still a string (double encoded), parse again
+        if (typeof parsedData === 'string') {
+          try {
+            parsedData = JSON.parse(parsedData)
+          } catch (innerError) {
+            console.error('Error parsing inner JSON:', innerError)
+            // Continue with the string version if second parse fails
+          }
+        }
+        
+        console.log('Parsed data:', parsedData)
 
-        if (!Array.isArray(parsedData)) {
-          console.error('Invalid data structure, expected array:', parsedData)
-          setError('Invalid exam data structure')
-          return
+        // Validate the data structure
+        if (!parsedData || typeof parsedData !== 'object') {
+          throw new Error('Invalid exam data format')
         }
 
-        const processedData = parsedData.map(question => ({
-          question: question.question || '',
-          question_type: question.question_type || 'mcq',
-          difficulty: question.difficulty || '',
-          options: question.options || [],
-          correct_option: question.correct_option || '',
-          answer: question.answer || '',
-          explanation: question.explanation || ''
-        }))
+        // Handle both array and single object formats
+        const questionsArray = Array.isArray(parsedData) ? parsedData : [parsedData]
+        
+        // Process and validate each question
+        const processedData = questionsArray.map(question => {
+          if (!question || typeof question !== 'object') {
+            throw new Error('Invalid question format')
+          }
+
+          return {
+            question: String(question.question || ''),
+            question_type: String(question.question_type || 'mcq'),
+            difficulty: String(question.difficulty || ''),
+            options: Array.isArray(question.options) ? question.options.map(String) : [],
+            correct_option: String(question.correct_option || ''),
+            answer: String(question.answer || ''),
+            explanation: String(question.explanation || '')
+          }
+        })
+
+        if (processedData.length === 0) {
+          throw new Error('No valid questions found in exam data')
+        }
 
         console.log('Processed exam data:', processedData)
         setExamData(processedData)
       } catch (parseError) {
-        console.error('Parse error:', parseError)
-        setError('Failed to parse exam data')
+        console.error('Parse error:', parseError, 'Raw data:', storedExam)
+        // Handle different types of errors
+        const errorMessage = parseError instanceof Error 
+          ? parseError.message 
+          : typeof parseError === 'string'
+            ? parseError
+            : 'Failed to parse exam data';
+        setError(errorMessage)
       }
     } catch (error) {
       console.error('Error loading exam:', error)
-      setError('Failed to load exam data')
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : typeof error === 'string'
+          ? error
+          : 'Failed to load exam data';
+      setError(errorMessage)
     }
   }, [])
 
@@ -276,6 +310,57 @@ export default function ExamDisplayPage() {
     return questions?.some(q => q.question_type === 'mcq') ?? false;
   }
 
+  const formatQuestionText = (text: string): JSX.Element => {
+    // Check if the text contains a code block
+    const codeBlockRegex = /```([\s\S]*?)```/g;
+    const parts = text.split(codeBlockRegex);
+
+    if (parts.length === 1) {
+      // No code blocks found, return plain text
+      return <p className="text-lg font-medium text-gray-900 dark:text-gray-100 whitespace-pre-wrap">{text}</p>;
+    }
+
+    // Process text with code blocks
+    const elements: JSX.Element[] = [];
+    let index = 0;
+
+    parts.forEach((part, i) => {
+      if (i % 2 === 0) {
+        // Regular text
+        if (part.trim()) {
+          elements.push(
+            <p key={`text-${index}`} className="text-lg font-medium text-gray-900 dark:text-gray-100 whitespace-pre-wrap mb-4">
+              {part}
+            </p>
+          );
+        }
+      } else {
+        // Code block
+        elements.push(
+          <pre key={`code-${index}`} className="relative">
+            <div className="absolute right-2 top-2">
+              <button
+                onClick={() => navigator.clipboard.writeText(part.trim())}
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+                title="Copy code"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </button>
+            </div>
+            <code className="block bg-gray-50 dark:bg-gray-900 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+              {part.trim()}
+            </code>
+          </pre>
+        );
+      }
+      index++;
+    });
+
+    return <div>{elements}</div>;
+  };
+
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
@@ -324,7 +409,7 @@ export default function ExamDisplayPage() {
                   </span>
                 </div>
 
-                <p className="text-lg font-medium text-gray-900 dark:text-gray-100">{question.question}</p>
+                {formatQuestionText(question.question)}
 
                 {question.question_type === 'mcq' ? (
                   <>
