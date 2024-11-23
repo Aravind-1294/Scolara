@@ -325,18 +325,19 @@ export default function ExamDisplayPage() {
     let index = 0;
 
     parts.forEach((part, i) => {
-      if (i % 2 === 0) {
-        // Regular text
-        if (part.trim()) {
-          elements.push(
-            <p key={`text-${index}`} className="text-lg font-medium text-gray-900 dark:text-gray-100 whitespace-pre-wrap mb-4">
-              {part}
-            </p>
-          );
-        }
-      } else {
-        // Code block
+    if (i % 2 === 0) {
+      // Regular text
+      if (part.trim()) {
         elements.push(
+          <p key={`text-${index}`} className="text-lg font-medium text-gray-900 dark:text-gray-100 whitespace-pre-wrap mb-4">
+            {part}
+          </p>
+        );
+      }
+    } else {
+      // Code block
+      elements.push(
+        <div key={`code-container-${index}`} className="my-4 rounded-lg bg-blue-50/50 dark:bg-blue-900/20 p-1">
           <pre key={`code-${index}`} className="relative">
             <div className="absolute right-2 top-2">
               <button
@@ -349,17 +350,18 @@ export default function ExamDisplayPage() {
                 </svg>
               </button>
             </div>
-            <code className="block bg-gray-50 dark:bg-gray-900 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+            <code className="block bg-white dark:bg-gray-800 p-4 rounded-lg font-mono text-sm overflow-x-auto border border-blue-100 dark:border-blue-800">
               {part.trim()}
             </code>
           </pre>
-        );
-      }
-      index++;
-    });
+        </div>
+      );
+    }
+    index++;
+  });
 
-    return <div>{elements}</div>;
-  };
+  return <div>{elements}</div>;
+};
 
   if (error) {
     return (
