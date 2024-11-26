@@ -350,7 +350,7 @@ export default function Dashboard() {
     setError('')
 
     try {
-      const response = await fetch('https://web-production-d90d4.up.railway.app/api/generate-extracted-text-exam', {
+      const response = await fetch('https://web-production-95d0.up.railway.app/api/generate-extracted-text-exam', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -410,7 +410,7 @@ export default function Dashboard() {
         throw new Error('Invalid number of questions');
       }
 
-      const response = await fetch('https://web-production-d90d4.up.railway.app/api/generate-general-exam', {
+      const response = await fetch('https://web-production-95d0.up.railway.app/api/generate-general-exam', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
