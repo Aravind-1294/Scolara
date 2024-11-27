@@ -14,6 +14,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Progress } from "../components/ui/progress"
+import { Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../components/ui/alert-dialog";
 
 const CHARACTER_LIMIT = 3000;
 const FREE_TIER_EXAM_LIMIT = 5;
@@ -59,10 +61,12 @@ interface DailyExamLimit {
 
 const ExamCard = ({ 
   exam, 
-  onExamClick 
+  onExamClick,
+  onDelete 
 }: { 
   exam: ExamResult;
   onExamClick: (examId: string) => void;
+  onDelete: (examId: string) => void;
 }) => {
   const router = useRouter();
   const scorePercentage = (exam.score / exam.total_questions) * 100;
@@ -73,6 +77,10 @@ const ExamCard = ({
     if (percentage >= 60) return 'text-blue-600';
     if (percentage >= 40) return 'text-yellow-600';
     return 'text-red-600';
+  };
+
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation(); // Prevent card click when clicking delete
   };
 
   const formattedDate = useMemo(() => {
@@ -90,8 +98,38 @@ const ExamCard = ({
   return (
     <div
       onClick={() => onExamClick(exam.id)}
-      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 overflow-hidden cursor-pointer group"
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 overflow-hidden cursor-pointer group relative"
     >
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <button
+            onClick={handleDelete}
+            className="absolute top-2 right-2 p-2 rounded-full bg-white/80 hover:bg-red-50 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the exam and all its data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-500 hover:bg-red-600"
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation();
+                onDelete(exam.id);
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <div className="p-4 md:p-6">
         <div className="flex justify-between items-start">
           <div>
@@ -498,6 +536,23 @@ export default function Dashboard() {
     }
   };
 
+  const deleteExam = async (examId: string) => {
+    try {
+      const { error } = await supabase
+        .from('exam_results')
+        .delete()
+        .eq('id', examId);
+
+      if (error) throw error;
+
+      // Update the UI by removing the deleted exam
+      setPastExams(prevExams => prevExams.filter(exam => exam.id !== examId));
+    } catch (error) {
+      console.error('Error deleting exam:', error);
+      setError('Failed to delete exam');
+    }
+  };
+
   const LimitWarningModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     if (!isOpen) return null;
 
@@ -677,7 +732,7 @@ export default function Dashboard() {
                   <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Your Performance</h1>
                   <p className="text-gray-600 dark:text-gray-400 mt-1">Track your progress and analyze your exam results</p>
                 </div>
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                   <button
                     onClick={handleCreateExamClick}
                     className="w-full sm:w-auto bg-gradient-to-r from-blue-600 dark:from-blue-700 to-blue-700 dark:to-blue-800 text-white px-6 py-2.5 rounded-full font-medium hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
@@ -854,6 +909,7 @@ export default function Dashboard() {
                       key={exam.id}
                       exam={exam}
                       onExamClick={handleExamClick}
+                      onDelete={deleteExam}
                     />
                   ))}
                 </div>
