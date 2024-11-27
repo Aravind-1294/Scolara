@@ -83,6 +83,11 @@ const ExamCard = ({
     e.stopPropagation(); // Prevent card click when clicking delete
   };
 
+  const getExamName = (exam: ExamResult) => {
+    if (!exam.exam_title) return "Unknown";
+    return exam.exam_title;
+  };
+
   const formattedDate = useMemo(() => {
     const date = new Date(exam.created_at);
     return new Intl.DateTimeFormat('en-US', {
@@ -135,7 +140,7 @@ const ExamCard = ({
           <div>
             <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-2">
               <h3 className="font-semibold text-gray-800 dark:text-white text-sm md:text-base group-hover:text-blue-600 transition-colors">
-                {exam.exam_title}
+                {getExamName(exam)}
               </h3>
               {hasValidScore ? (
                 <span className="inline-block px-2 py-1 bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-full w-fit">
@@ -416,6 +421,8 @@ export default function Dashboard() {
         }
 
         localStorage.setItem('generatedExam', JSON.stringify(formattedData))
+        localStorage.setItem('examType', 'generatefromtext')
+        localStorage.setItem('examTitle', payload.textContent.split('\n')[0] || 'Unknown')
         
         router.push('/exam-display')
       } catch (formatError) {
@@ -476,6 +483,9 @@ export default function Dashboard() {
         }
 
         localStorage.setItem('generatedExam', JSON.stringify(formattedData))
+        localStorage.setItem('examType', 'general')
+        localStorage.setItem('examTitle', examData.topics)
+        
         router.push('/exam-display')
       } catch (formatError) {
         throw new Error(`Failed to format exam data: ${formatError instanceof Error ? formatError.message : 'Unknown error'}`);

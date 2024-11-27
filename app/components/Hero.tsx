@@ -3,6 +3,16 @@ import { motion } from "framer-motion";
 import Link from 'next/link'
 import Counter from './Counter';
 import { useState, useEffect } from 'react';
+import { FiCode, FiDatabase, FiCpu, FiAward } from 'react-icons/fi';
+import { HiOutlineSparkles, HiOutlineLightBulb, HiOutlineRefresh } from 'react-icons/hi';
+import { BsArrowRight, BsStars } from 'react-icons/bs';
+import { IconType } from 'react-icons';
+
+interface FloatingIconProps {
+  icon: IconType;
+  delay?: number;
+  className?: string;
+}
 
 function ArcadeEmbed() {
   return (
@@ -20,10 +30,42 @@ function ArcadeEmbed() {
   )
 }
 
+function FloatingIcon({ icon: Icon, delay = 0, className = "" }: FloatingIconProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ 
+        opacity: [0.5, 1, 0.5],
+        y: [-10, 10, -10],
+        x: [-5, 5, -5],
+        rotate: [-5, 5, -5]
+      }}
+      transition={{
+        duration: 6,
+        delay,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }}
+      className={`absolute text-2xl ${className}`}
+    >
+      <Icon />
+    </motion.div>
+  );
+}
+
 export default function Hero() {
-  const [text, setText] = useState("Smarter");
-  const [showCursor, setShowCursor] = useState(true);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showDemo, setShowDemo] = useState(false);
+
+  const sampleQuestion = {
+    question: "What is the primary benefit of using AI in education?",
+    options: [
+      "Personalized Learning Experience",
+      "Instant Feedback and Assessment",
+      "Adaptive Content Delivery",
+      "Interactive Study Materials"
+    ]
+  };
 
   const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target instanceof HTMLElement && e.target.classList.contains('modal-overlay')) {
@@ -31,209 +73,252 @@ export default function Hero() {
     }
   };
 
-  useEffect(() => {
-    const words = ["Smarter", "Clever"];
-    let currentIndex = 0;
-    let isDeleting = false;
-    let currentText = "";
-
-    const type = () => {
-      const currentWord = words[currentIndex];
-      
-      if (isDeleting) {
-        currentText = currentWord.substring(0, currentText.length - 1);
-      } else {
-        currentText = currentWord.substring(0, currentText.length + 1);
-      }
-
-      setText(currentText);
-
-      let typeSpeed = isDeleting ? 100 : 200;
-
-      if (!isDeleting && currentText === currentWord) {
-        typeSpeed = 2000;
-        isDeleting = true;
-      } else if (isDeleting && currentText === "") {
-        isDeleting = false;
-        currentIndex = (currentIndex + 1) % words.length;
-        typeSpeed = 500;
-      }
-
-      setTimeout(type, typeSpeed);
-    };
-
-    type();
-
-    const cursorInterval = setInterval(() => {
-      setShowCursor(prev => !prev);
-    }, 530);
-
-    return () => clearInterval(cursorInterval);
-  }, []);
-
-  const backgroundVariants = {
-    animate: {
-      scale: [1, 1.2, 1],
-      opacity: [0.3, 0.2, 0.3],
-      transition: {
-        duration: 8,
-        repeat: Infinity,
-      },
-    },
-  };
-
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Animated Gradient Background */}
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/30">
+      {/* Modern Gradient Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(59,130,246,0.1),transparent_50%),radial-gradient(circle_at_bottom_left,_rgba(147,51,234,0.1),transparent_50%)]" />
-        <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(79,70,229,0.1),transparent_50%),radial-gradient(circle_at_bottom_left,_rgba(219,39,119,0.1),transparent_50%)]" />
+        <motion.div 
+          className="absolute top-0 left-0 w-full h-full opacity-30"
+          initial={{ backgroundPosition: '0% 0%' }}
+          animate={{ 
+            backgroundPosition: ['0% 0%', '100% 100%'],
+          }}
+          transition={{
+            duration: 20,
+            ease: "linear",
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+          style={{
+            backgroundImage: 'radial-gradient(circle at center, rgba(99,102,241,0.15) 0%, transparent 20%, transparent 100%)',
+            backgroundSize: '30px 30px',
+          }}
+        />
       </div>
       
-      {/* Animated Circles */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div 
-          variants={backgroundVariants}
-          animate="animate"
-          className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-r from-blue-400/30 to-cyan-400/30 rounded-full blur-3xl"
-        />
-        <motion.div 
-          variants={backgroundVariants}
-          animate="animate"
-          className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-r from-purple-400/30 to-pink-400/30 rounded-full blur-3xl"
-        />
-      </div>
+      {/* Enhanced Floating Icons */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        className="absolute inset-0 overflow-hidden pointer-events-none"
+      >
+        <FloatingIcon icon={FiCode} className="top-20 left-[15%] text-indigo-500/40 text-2xl" delay={0} />
+        <FloatingIcon icon={FiDatabase} className="top-40 right-[20%] text-purple-500/40 text-3xl" delay={1} />
+        <FloatingIcon icon={FiCpu} className="bottom-32 left-[25%] text-blue-500/40 text-2xl" delay={2} />
+        <FloatingIcon icon={HiOutlineSparkles} className="top-1/3 left-[75%] text-pink-500/40 text-3xl" delay={3} />
+        <FloatingIcon icon={BsStars} className="bottom-1/4 right-[30%] text-indigo-500/40 text-2xl" delay={4} />
+        <FloatingIcon icon={HiOutlineLightBulb} className="top-1/4 right-[10%] text-purple-500/40 text-3xl" delay={5} />
+      </motion.div>
 
-      {/* Floating Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            y: [-20, 20, -20],
-            x: [-10, 10, -10],
-            rotate: [0, 5, -5, 0],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute top-1/4 right-1/4 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl backdrop-blur-sm border border-white/20"
-        />
-        <motion.div
-          animate={{
-            y: [20, -20, 20],
-            x: [10, -10, 10],
-            rotate: [0, -5, 5, 0],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute bottom-1/4 left-1/4 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full backdrop-blur-sm border border-white/20"
-        />
-      </div>
-
-      {/* Content */}
-      <div className="relative min-h-screen flex items-center py-12 md:py-0">
-        <div className="container mx-auto px-4">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl mx-auto text-center"
-          >
+      {/* Main Content */}
+      <div className="relative container mx-auto px-6 lg:px-8 pt-24 pb-16 sm:pt-32 sm:pb-32 min-h-screen flex items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 w-full items-center">
+          {/* Left Column - Enhanced Text and Buttons */}
+          <div className="flex flex-col justify-center">
             <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: "6rem" }}
-              transition={{ duration: 1, delay: 0.5 }}
-              className="h-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mx-auto mb-6 md:mb-8"
-            />
-
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 md:mb-6 leading-tight px-4"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="relative"
             >
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Learn {text}
-                <span className={`${showCursor ? 'opacity-100' : 'opacity-0'} transition-opacity inline-block w-[2px] h-[0.7em] bg-black -mb-1 ml-[2px]`}>
+              <div className="absolute -top-14 left-0 text-sm font-medium">
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-600">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                  </span>
+                  New Feature Released
                 </span>
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                with AI Power
-              </span>
-            </motion.h1>
-            
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 md:mb-12 leading-relaxed px-4"
-            >
-              Transform your learning journey with AI-generated questions,
-              <br className="hidden sm:block" /> instant insights, and personalized guidance.
-            </motion.p>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.7 }}
-              className="flex flex-col sm:flex-row justify-center gap-4 px-4"
-            >
-              <Link href="/Dashboard" className="w-full sm:w-auto">
-                <motion.button 
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-full sm:w-auto group px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl text-lg shadow-lg shadow-blue-200/50 relative overflow-hidden"
-                >
-                  <span className="relative z-10">Start Learning Free</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </motion.button>
-              </Link>
-              
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-2 border-transparent bg-white/80 backdrop-blur-sm rounded-xl text-lg relative group"
-                onClick={() => setShowDemo(true)}
-              >
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Watch Demo
+              </div>
+              <h1 className="text-6xl sm:text-7xl lg:text-8xl font-bold mb-8 tracking-tight">
+                <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  Learn Smarter
                 </span>
-                <div className="absolute inset-0 rounded-xl border-2 border-transparent bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity" style={{ mask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)', maskComposite: 'exclude' }} />
-              </motion.button>
+                <br />
+                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  with AI
+                </span>
+              </h1>
             </motion.div>
 
-            {/* Stats */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.9 }}
-              className="mt-12 md:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-8 max-w-2xl mx-auto px-4"
+            <motion.p
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-xl text-gray-600/90 mb-12 max-w-xl leading-relaxed"
             >
-              {[
-                { value: 10000, label: "Students", suffix: "+" },
-                { value: 50000, label: "Questions", suffix: "+" },
-                { value: 99, label: "Satisfaction", suffix: "%" }
-              ].map((stat, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ y: -5 }}
-                  className="text-center p-4 md:p-6 rounded-2xl bg-white/50 backdrop-blur-sm border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-300"
+              Experience the future of education with our AI-powered platform. 
+              Master concepts faster, learn smarter, and achieve more with personalized learning.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="flex flex-col sm:flex-row gap-5 mb-16"
+            >
+              <motion.button
+                onClick={() => setShowDemo(true)}
+                className="group px-8 py-4 text-lg rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold 
+                  relative overflow-hidden shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all duration-300
+                  hover:scale-105 transform flex items-center gap-3 w-full sm:w-auto"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  Watch Demo <BsArrowRight className="text-xl group-hover:translate-x-1 transition-transform" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </motion.button>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Link 
+                  href="/signup" 
+                  className="group px-8 py-4 text-lg rounded-2xl border-2 border-indigo-100 text-gray-700 font-semibold 
+                    hover:border-indigo-200 hover:bg-indigo-50/50 transition-all duration-300 w-full sm:w-auto inline-block text-center
+                    relative overflow-hidden"
                 >
-                  <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    <Counter 
-                      end={stat.value} 
-                      duration={2000}
-                      suffix={stat.suffix}
-                    />
-                  </div>
-                  <div className="text-gray-600 mt-1">{stat.label}</div>
+                  <span className="relative z-10 flex items-center gap-2 justify-center">
+                    Get Started <BsArrowRight className="text-xl group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="flex gap-12 flex-wrap"
+            >
+              <div className="relative">
+                <div className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  <Counter end={50000} duration={2000} suffix="+" />
+                </div>
+                <div className="text-gray-600/80 mt-2 font-medium">Active Users</div>
+              </div>
+              <div>
+                <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  <Counter end={1000} duration={2000} suffix="+" />
+                </div>
+                <div className="text-gray-600/80 mt-2 font-medium">Course Hours</div>
+              </div>
+              <div>
+                <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">
+                  <Counter end={95} duration={2000} suffix="%" />
+                </div>
+                <div className="text-gray-600/80 mt-2 font-medium">Success Rate</div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Right Column - Enhanced Interactive Question Demo */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="flex items-center"
+          >
+            <motion.div 
+              className="bg-white/95 rounded-3xl p-8 shadow-2xl w-full border border-indigo-50 relative overflow-hidden group"
+              whileHover={{ 
+                boxShadow: "0 20px 40px -15px rgba(79, 70, 229, 0.15)",
+                y: -5
+              }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            >
+              {/* Animated gradient background */}
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 via-transparent to-purple-50/50 opacity-50"
+                animate={{
+                  background: [
+                    "linear-gradient(to bottom right, rgba(99,102,241,0.08), transparent, rgba(168,85,247,0.08))",
+                    "linear-gradient(to bottom right, rgba(168,85,247,0.08), transparent, rgba(99,102,241,0.08))",
+                  ],
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                }}
+              />
+
+              <div className="relative">
+                <motion.div 
+                  className="mb-8"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <motion.span 
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-sm font-medium group-hover:bg-indigo-100 transition-colors duration-300"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <HiOutlineLightBulb className="text-lg" />
+                    Sample Question
+                  </motion.span>
+                  <motion.h3 
+                    className="text-2xl font-semibold text-gray-800 mt-3 leading-relaxed"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                  >
+                    {sampleQuestion.question}
+                  </motion.h3>
                 </motion.div>
-              ))}
+                <div className="space-y-4">
+                  {sampleQuestion.options.map((option, index) => (
+                    <motion.button
+                      key={index}
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                      onClick={() => setSelectedAnswer(option)}
+                      className={`w-full p-4 text-left rounded-2xl border-2 transition-all duration-300 group/option relative
+                        ${selectedAnswer === option 
+                          ? 'border-indigo-500 bg-indigo-50 shadow-lg shadow-indigo-500/10' 
+                          : 'border-gray-100 hover:border-indigo-200 hover:bg-white'}`}
+                      whileHover={{ 
+                        scale: 1.02,
+                        y: -2,
+                        boxShadow: "0 8px 20px -8px rgba(79, 70, 229, 0.25)"
+                      }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="relative flex items-center gap-4">
+                        <motion.span 
+                          className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center text-sm font-medium
+                            transition-all duration-300 ${
+                              selectedAnswer === option 
+                                ? 'border-indigo-500 bg-indigo-500 text-white scale-110' 
+                                : 'border-gray-200 group-hover/option:border-indigo-200 text-gray-500'
+                            }`}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          {String.fromCharCode(65 + index)}
+                        </motion.span>
+                        <span className="text-gray-700 font-medium relative z-10">
+                          {option}
+                          {selectedAnswer === option && (
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-10"
+                              layoutId="highlight"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 0.1 }}
+                              transition={{ duration: 0.3 }}
+                            />
+                          )}
+                        </span>
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         </div>
@@ -241,13 +326,15 @@ export default function Hero() {
 
       {/* Demo Modal */}
       {showDemo && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 modal-overlay"
-          onClick={handleOutsideClick}
-        >
-          <div className="bg-white rounded-2xl w-full max-w-6xl p-4 relative">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center modal-overlay"
+          onClick={handleOutsideClick}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl p-4 w-full max-w-5xl mx-4"
+          >
             <ArcadeEmbed />
-          </div>
+          </motion.div>
         </div>
       )}
     </div>

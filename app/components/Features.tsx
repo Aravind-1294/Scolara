@@ -80,7 +80,7 @@ export default function Features() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={1.5}
-            d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"
+            d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 007.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"
           />
         </svg>
       ),
@@ -100,8 +100,8 @@ export default function Features() {
       },
     },
     {
-      title: "24/7 AI Support",
-      description: "Get help anytime with our intelligent chatbot assistant.",
+      title: "Track Your Progress",
+      description: "Comprehensive analytics and insights about your exam performance.",
       icon: (
         <svg
           className="w-8 h-8"
@@ -113,98 +113,147 @@ export default function Features() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={1.5}
-            d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"
+            d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
           />
         </svg>
       ),
       color: "from-green-500/10 to-green-500/20",
       expandedContent: {
-        title: "Your Personal AI Tutor",
+        title: "Comprehensive Performance Analytics",
         description:
-          "Have questions? Our AI tutor is always ready to help. Get instant explanations, step-by-step solutions, and personalized learning recommendations any time of day.",
+          "Get detailed insights into your exam performance with our advanced analytics dashboard. Track your progress over time, analyze performance trends, and identify areas for improvement.",
         benefits: [
-          "24/7 availability",
-          "Contextual responses",
-          "Multiple teaching styles",
-          "Interactive discussions",
-          "Concept clarification",
+          "Overall exam performance metrics",
+          "Weekly and daily exam statistics",
+          "Latest scores and averages",
+          "Performance trend analysis",
+          "Subject-wise breakdown",
         ],
-        image: "/ai-support.png",
+        image: "/exam-analytics.png",
       },
     },
   ];
 
   return (
-    <section id="features" className="py-16 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/2 left-0 w-72 h-72 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute top-1/2 right-0 w-72 h-72 bg-yellow-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/4 left-1/2 w-72 h-72 bg-pink-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+    <section className="relative py-24 overflow-hidden bg-slate-50">
+      {/* Modern background with animated patterns */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50" />
+      </div>
+      
+      {/* Floating elements */}
+      <div aria-hidden="true" className="absolute -top-48 left-0 transform translate-x-[-30%]">
+        <div className="h-[400px] w-[400px] rounded-full bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 blur-3xl animate-blob" />
+      </div>
+      <div aria-hidden="true" className="absolute -top-48 right-0 transform translate-x-[30%]">
+        <div className="h-[400px] w-[400px] rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 blur-3xl animate-blob animation-delay-2000" />
       </div>
 
-      <div className="container mx-auto px-4 relative">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-20"
-        >
-          <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">
-            Features
-          </span>
-          <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-6 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+      <div className="relative container mx-auto px-4">
+        {/* Section Header */}
+        <div className="max-w-3xl mx-auto text-center mb-24">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center justify-center gap-2 px-6 py-2 mb-8 rounded-full bg-gradient-to-r from-blue-500/10 to-violet-500/10 border border-blue-100/50 backdrop-blur-sm"
+          >
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-gradient-to-r from-blue-500 to-violet-500"></span>
+            </span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-violet-600 text-sm font-medium">
+              Powerful Features
+            </span>
+          </motion.div>
+          
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-4xl md:text-6xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-violet-900 to-gray-900"
+          >
             Everything You Need to Excel
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Powerful features designed to transform your learning experience
-          </p>
-        </motion.div>
+          </motion.h2>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="text-gray-600 text-lg md:text-xl"
+          >
+            Powerful tools and features designed to transform your learning experience
+            and help you achieve your goals faster.
+          </motion.p>
+        </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        {/* Features Grid */}
+        <div className="grid md:grid-cols-3 gap-8 relative">
           {features.map((feature, index) => (
-            <div key={index}>
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -8 }}
+              className="relative group"
+            >
               <motion.div
                 layoutId={`card-${index}`}
                 onClick={() => setExpandedId(index)}
-                className={`cursor-pointer p-8 rounded-2xl bg-gradient-to-br ${feature.color} backdrop-blur-sm border border-white/20 h-full transform transition-all duration-300 hover:shadow-xl ${
-                  expandedId === null ? "hover:-translate-y-2" : ""
-                }`}
+                className="relative h-full overflow-hidden rounded-2xl transition-all duration-300"
               >
-                <div className="text-blue-600 mb-6">{feature.icon}</div>
-                <h3 className="text-2xl font-semibold mb-4 text-gray-800">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-                {expandedId !== index && (
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="mt-6 px-4 py-2 text-blue-600 hover:text-blue-700 font-medium inline-flex items-center"
-                  >
-                    Learn more
-                    <svg
-                      className="w-4 h-4 ml-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </motion.button>
-                )}
+                {/* Card Design */}
+                <div className="p-8 bg-white rounded-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300
+                  group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group-hover:border-violet-100">
+                  {/* Icon Container */}
+                  <div className="mb-8 relative">
+                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${feature.color} transition-transform duration-300
+                      group-hover:scale-110 group-hover:rotate-3`}>
+                      <div className="w-8 h-8 text-violet-600">
+                        {feature.icon}
+                      </div>
+                    </div>
+                    <div className="absolute inset-0 blur-2xl opacity-30" style={{ background: feature.color }} />
+                  </div>
+
+                  {/* Content */}
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    {feature.description}
+                  </p>
+
+                  {/* Learn More Button */}
+                  {!expandedId && (
+                    <button className="inline-flex items-center text-violet-600 font-medium hover:text-violet-700 transition-colors duration-200">
+                      Learn more
+                      <svg
+                        className="w-5 h-5 ml-2 transform transition-transform duration-200 group-hover:translate-x-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
               </motion.div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
-        {/* Expanded Card Modal */}
+        {/* Enhanced Modal */}
         <AnimatePresence>
           {expandedId !== null && (
             <>
@@ -213,79 +262,115 @@ export default function Features() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setExpandedId(null)}
-                className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm"
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
               />
-              <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <motion.div
                   layoutId={`card-${expandedId}`}
                   className="w-full max-w-2xl"
                   ref={cardRef}
                 >
-                  <div className="bg-white rounded-2xl p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
-                    <div className="relative">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setExpandedId(null);
-                        }}
-                        className="absolute top-0 right-0 p-2 text-gray-400 hover:text-gray-600"
+                  <div className="relative bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/20">
+                    {/* Close Button */}
+                    <motion.button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedId(null);
+                      }}
+                      className="absolute -right-3 -top-3 p-2 rounded-full bg-white shadow-lg hover:shadow-xl transition-all duration-300 group"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <svg
+                        className="w-5 h-5 text-gray-500 group-hover:text-violet-600 transition-colors duration-300"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
                       >
-                        <svg
-                          className="w-6 h-6"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </motion.button>
 
-                      <div className="text-blue-600 mb-6">
+                    {/* Modal Content */}
+                    <div className="space-y-8">
+                      {/* Icon */}
+                      <motion.div
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                        className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 text-white shadow-lg shadow-violet-500/20"
+                      >
                         {features[expandedId].icon}
-                      </div>
-                      <h3 className="text-3xl font-bold mb-4 text-gray-800">
-                        {features[expandedId].expandedContent.title}
-                      </h3>
-                      <p className="text-gray-600 leading-relaxed mb-6">
-                        {features[expandedId].expandedContent.description}
-                      </p>
+                      </motion.div>
 
-                      <div className="bg-gray-50 rounded-xl p-6 mb-6">
-                        <h4 className="text-lg font-semibold mb-4">Key Benefits</h4>
-                        <ul className="space-y-3">
+                      {/* Title & Description */}
+                      <div className="space-y-4">
+                        <motion.h3
+                          initial={{ y: 20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.2 }}
+                          className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-violet-900 to-gray-900"
+                        >
+                          {features[expandedId].expandedContent.title}
+                        </motion.h3>
+                        <motion.p
+                          initial={{ y: 20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.3 }}
+                          className="text-gray-600 leading-relaxed text-lg"
+                        >
+                          {features[expandedId].expandedContent.description}
+                        </motion.p>
+                      </div>
+
+                      {/* Benefits */}
+                      <motion.div
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                        className="bg-gradient-to-br from-blue-50 to-violet-50 rounded-xl p-8"
+                      >
+                        <h4 className="text-xl font-semibold text-gray-900 mb-6">
+                          Key Benefits
+                        </h4>
+                        <ul className="space-y-4">
                           {features[expandedId].expandedContent.benefits.map(
                             (benefit, index) => (
                               <motion.li
                                 key={index}
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="flex items-center text-gray-700"
+                                transition={{ delay: 0.5 + index * 0.1 }}
+                                className="flex items-center text-gray-700 group"
                               >
-                                <svg
-                                  className="w-5 h-5 text-green-500 mr-3"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M5 13l4 4L19 7"
-                                  />
-                                </svg>
-                                {benefit}
+                                <span className="flex-shrink-0 w-6 h-6 mr-4 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white shadow-md shadow-violet-500/20">
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M5 13l4 4L19 7"
+                                    />
+                                  </svg>
+                                </span>
+                                <span className="group-hover:text-violet-700 transition-colors duration-300">
+                                  {benefit}
+                                </span>
                               </motion.li>
                             )
                           )}
                         </ul>
-                      </div>
+                      </motion.div>
                     </div>
                   </div>
                 </motion.div>

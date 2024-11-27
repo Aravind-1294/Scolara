@@ -34,11 +34,15 @@ export default function Navbar() {
     <motion.nav 
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed w-full z-50 py-4 transition-all duration-300 ${
-        isScrolled ? "bg-white/80 backdrop-blur-md shadow-md" : "bg-transparent"
+      className={`fixed w-full z-50 py-4 transition-all duration-500 ease-in-out ${
+        isScrolled 
+          ? "bg-white/40 backdrop-blur-md border-none" 
+          : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto px-4">
+      <div className={`container mx-auto px-4 transition-all duration-500 ease-in-out ${
+        isScrolled ? "drop-shadow-sm" : ""
+      }`}>
         <div className="flex justify-between items-center">
           <Link href="/">
             <motion.div 
