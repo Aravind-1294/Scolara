@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import Link from 'next/link'
 import Counter from './Counter';
 import { useState, useEffect } from 'react';
@@ -56,6 +56,8 @@ function FloatingIcon({ icon: Icon, delay = 0, className = "" }: FloatingIconPro
 export default function Hero() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showDemo, setShowDemo] = useState(false);
+  const [showCongrats, setShowCongrats] = useState(false);
+  const [hasAnswered, setHasAnswered] = useState(false);
 
   const sampleQuestion = {
     question: "What is the primary benefit of using AI in education?",
@@ -70,6 +72,81 @@ export default function Hero() {
   const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target instanceof HTMLElement && e.target.classList.contains('modal-overlay')) {
       setShowDemo(false);
+    }
+  };
+
+  const handleAnswerClick = (option: string) => {
+    setSelectedAnswer(option);
+    if (!hasAnswered) {
+      setShowCongrats(true);
+      setHasAnswered(true);
+      
+      // Hide the congratulatory message after 3 seconds
+      setTimeout(() => {
+        setShowCongrats(false);
+      }, 3000);
+    }
+  };
+
+  const particles = Array.from({ length: 12 });
+  const stars = Array.from({ length: 8 });
+  const ripples = Array.from({ length: 3 });
+
+  const generateParticleVariants = (index: number) => ({
+    initial: { 
+      x: 0, 
+      y: 0, 
+      scale: 0,
+      opacity: 1
+    },
+    animate: {
+      x: Math.cos(index * 30 * (Math.PI / 180)) * 100,
+      y: Math.sin(index * 30 * (Math.PI / 180)) * 100,
+      scale: 1,
+      opacity: 0,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut"
+      }
+    }
+  });
+
+  const generateStarVariants = (index: number): Variants => ({
+    initial: { 
+      x: 0,
+      y: 0,
+      scale: 0,
+      opacity: 0,
+      rotate: 0
+    },
+    animate: {
+      x: (Math.random() - 0.5) * 150,
+      y: (Math.random() - 0.5) * 150,
+      scale: [0, 1, 0.5],
+      opacity: [0, 1, 0],
+      rotate: [-30, 30],
+      transition: {
+        duration: 2,
+        delay: index * 0.1,
+        repeat: Infinity,
+        repeatType: "mirror" as const
+      }
+    }
+  });
+
+  const rippleVariants = {
+    initial: { 
+      scale: 0.5,
+      opacity: 0.8,
+    },
+    animate: {
+      scale: 1.5,
+      opacity: 0,
+      transition: {
+        duration: 1,
+        repeat: Infinity,
+        ease: "easeOut"
+      }
     }
   };
 
@@ -277,10 +354,10 @@ export default function Hero() {
                       initial={{ x: -20, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                      onClick={() => setSelectedAnswer(option)}
+                      onClick={() => handleAnswerClick(option)}
                       className={`w-full p-4 text-left rounded-2xl border-2 transition-all duration-300 group/option relative
                         ${selectedAnswer === option 
-                          ? 'border-indigo-500 bg-indigo-50 shadow-lg shadow-indigo-500/10' 
+                          ? 'border-green-500 bg-green-50 shadow-lg shadow-green-500/10' 
                           : 'border-gray-100 hover:border-indigo-200 hover:bg-white'}`}
                       whileHover={{ 
                         scale: 1.02,
@@ -294,7 +371,7 @@ export default function Hero() {
                           className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center text-sm font-medium
                             transition-all duration-300 ${
                               selectedAnswer === option 
-                                ? 'border-indigo-500 bg-indigo-500 text-white scale-110' 
+                                ? 'border-green-500 bg-green-500 text-white scale-110' 
                                 : 'border-gray-200 group-hover/option:border-indigo-200 text-gray-500'
                             }`}
                           whileHover={{ scale: 1.1 }}
@@ -323,6 +400,156 @@ export default function Hero() {
           </motion.div>
         </div>
       </div>
+
+      {/* Congratulatory Message with Enhanced Animations */}
+      <AnimatePresence>
+        {showCongrats && (
+          <>
+            {/* Particle Effects */}
+            <div className="fixed bottom-32 right-32 z-50 pointer-events-none">
+              {particles.map((_, index) => (
+                <motion.div
+                  key={`particle-${index}`}
+                  className="absolute w-3 h-3 rounded-full"
+                  style={{
+                    background: index % 3 === 0 ? '#4F46E5' : index % 3 === 1 ? '#EC4899' : '#8B5CF6',
+                    originX: '50%',
+                    originY: '50%'
+                  }}
+                  variants={generateParticleVariants(index)}
+                  initial="initial"
+                  animate="animate"
+                />
+              ))}
+              
+              {/* Floating Stars */}
+              {stars.map((_, index) => (
+                <motion.div
+                  key={`star-${index}`}
+                  className="absolute text-yellow-400"
+                  style={{
+                    fontSize: Math.random() * 10 + 15
+                  }}
+                  variants={generateStarVariants(index)}
+                  initial="initial"
+                  animate="animate"
+                >
+                  ⭐
+                </motion.div>
+              ))}
+
+              {/* Ripple Effects */}
+              {ripples.map((_, index) => (
+                <motion.div
+                  key={`ripple-${index}`}
+                  className="absolute w-32 h-32 rounded-full border-2 border-indigo-500/30"
+                  style={{
+                    originX: '50%',
+                    originY: '50%'
+                  }}
+                  variants={rippleVariants}
+                  initial="initial"
+                  animate="animate"
+                  transition={{
+                    delay: index * 0.2
+                  }}
+                />
+              ))}
+            </div>
+            
+            {/* Congratulatory Message */}
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0, 
+                scale: 1,
+                transition: {
+                  type: "spring",
+                  damping: 15,
+                  stiffness: 200
+                }
+              }}
+              exit={{ 
+                opacity: 0, 
+                y: -20, 
+                scale: 0.9,
+                transition: {
+                  duration: 0.2
+                }
+              }}
+              className="fixed bottom-8 right-8 bg-white rounded-2xl p-6 shadow-2xl z-50 overflow-hidden"
+            >
+              {/* Background sparkles */}
+              <motion.div
+                className="absolute inset-0 pointer-events-none"
+                animate={{
+                  backgroundPosition: ['0% 0%', '100% 100%']
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }}
+                style={{
+                  backgroundImage: 'radial-gradient(circle at center, rgba(99,102,241,0.15) 0%, transparent 50%)',
+                  backgroundSize: '100% 100%'
+                }}
+              />
+              
+              <div className="flex items-center gap-3 text-lg font-semibold text-gray-800 relative">
+                <motion.span 
+                  className="text-2xl flex gap-1"
+                  animate={{
+                    rotate: [0, -10, 10, -10, 10, 0],
+                    scale: [1, 1.2, 1, 1.2, 1],
+                  }}
+                  transition={{
+                    duration: 1,
+                    repeat: 2,
+                    repeatType: "reverse"
+                  }}
+                >
+                  <span>🎉</span>
+                  <motion.span
+                    animate={{
+                      rotate: [0, 360],
+                      scale: [1, 1.2, 1]
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      repeatType: "reverse"
+                    }}
+                  >
+                    🌟
+                  </motion.span>
+                  <span>✨</span>
+                </motion.span>
+                <motion.span
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ 
+                    opacity: 1, 
+                    x: 0,
+                    transition: {
+                      delay: 0.2
+                    }
+                  }}
+                  className="relative"
+                >
+                  Great start! You're taking your first step into AI-powered learning. Ready to explore more?
+                  <motion.div
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 to-purple-500"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 0.8, delay: 0.5 }}
+                  />
+                </motion.span>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Demo Modal */}
       {showDemo && (
