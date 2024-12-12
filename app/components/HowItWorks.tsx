@@ -91,15 +91,16 @@ export default function HowItWorks() {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left side - Data Flow Chart */}
-          <div className="relative h-[600px]">
+           {/* Left side - Data Flow Chart */}
+           <div className="relative lg:h-[600px]">
             {/* Data Flow Chart */}
-            <div className="relative w-full h-full bg-gradient-to-br from-gray-50/50 to-white/50 rounded-2xl border border-gray-100 shadow-lg p-8 overflow-hidden">
+            <div className="relative w-full h-full bg-gradient-to-br from-gray-50/50 to-white/50 rounded-2xl border border-gray-100 shadow-lg p-8">
+              {/* Remove overflow: hidden */}
               {/* Background Glow Effects */}
               <div className="absolute inset-0 opacity-30">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full blur-3xl" />
-                <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-full blur-2xl" />
-                <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-gradient-to-r from-violet-500/20 to-purple-500/20 rounded-full blur-2xl" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] md:w-[500px] h-[500px] md:h-[500px] bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-full blur-3xl" />
+                <div className="absolute top-0 left-0 w-[300px] md:w-[300px] h-[300px] md:h-[300px] bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-full blur-2xl" />
+                <div className="absolute bottom-0 right-0 w-[300px] md:w-[300px] h-[300px] md:h-[300px] bg-gradient-to-r from-violet-500/20 to-purple-500/20 rounded-full blur-2xl" />
               </div>
 
               {/* Connection Paths and Points Layer */}
@@ -229,15 +230,16 @@ export default function HowItWorks() {
               </div>
 
               {/* Center AI Node - Positioned at center point */}
-              <div 
+              <div
                 className="absolute z-20"
                 style={{
-                  left: '300px',
-                  top: '300px',
-                  transform: 'translate(-50%, -50%)'
+                  left: '50%',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
                 }}
               >
-                <div className="w-48 h-48">
+                {/* Increased Container Size and Added Overflow for Animation */}
+                <div className="w-56 h-56 md:w-48 md:h-48 relative overflow-visible">
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -253,17 +255,17 @@ export default function HowItWorks() {
                             style={{
                               top: '50%',
                               left: '50%',
-                              transform: `rotate(${degree}deg) translateX(28px)`
+                              transform: `rotate(${degree}deg) translateX(32px)`, // Adjusted for larger container
                             }}
                             animate={{
                               scale: [1, 1.5, 1],
-                              opacity: [0.5, 1, 0.5]
+                              opacity: [0.5, 1, 0.5],
                             }}
                             transition={{
                               duration: 1.5,
                               repeat: Infinity,
                               delay: index * 0.375,
-                              ease: "easeInOut"
+                              ease: "easeInOut",
                             }}
                           />
                         ))}
@@ -271,8 +273,8 @@ export default function HowItWorks() {
                     </div>
 
                     {/* Center Content with Pulse Effect */}
-                    <motion.div 
-                      className="absolute inset-4 rounded-full bg-white shadow-lg flex items-center justify-center backdrop-blur-sm"
+                    <motion.div
+                      className="absolute inset-4 p-4 rounded-full bg-white shadow-lg flex items-center justify-center backdrop-blur-sm"
                       animate={{
                         boxShadow: [
                           "0 0 0 0 rgba(79, 70, 229, 0.1)",
@@ -282,7 +284,7 @@ export default function HowItWorks() {
                       transition={{
                         duration: 1.5,
                         repeat: Infinity,
-                        ease: "easeOut"
+                        ease: "easeOut",
                       }}
                     >
                       <motion.div
@@ -293,17 +295,18 @@ export default function HowItWorks() {
                         transition={{
                           duration: 1.5,
                           repeat: Infinity,
-                          ease: "easeInOut"
+                          ease: "easeInOut",
                         }}
                       >
                         <BsLightning className="w-8 h-8 text-indigo-600 mx-auto mb-2" />
-                        <span className="text-sm font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Scholara AI</span>
+                        <span className="text-sm font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                          Scholara AI
+                        </span>
                       </motion.div>
                     </motion.div>
                   </motion.div>
                 </div>
               </div>
-
               {/* Input Node */}
               <div className="absolute top-8 left-8 z-10 w-48">
                 <ChartNode
@@ -315,7 +318,7 @@ export default function HowItWorks() {
               </div>
 
               {/* Output Node */}
-              <div className="absolute z-10 w-48" style={{ right: '48px', bottom: '8px' }}>
+              <div className="absolute z-10 w-48" style={{ right: '8px', bottom: '8px' }}>
                 <ChartNode
                   icon={BsQuestionCircle}
                   label="AI Generated Questions"
@@ -327,7 +330,7 @@ export default function HowItWorks() {
           </div>
 
           {/* Right side - Modern Section */}
-          <div className="absolute right-0 top-0 bottom-0 w-[600px] flex flex-col justify-center pr-24 z-10">
+          <div className="lg:absolute lg:right-0 lg:top-0 lg:bottom-0 lg:w-[600px] flex flex-col justify-center lg:pr-24 z-10 mt-16 lg:mt-0">
             {/* Section Title */}
             <div className="mb-12">
               <motion.div 
