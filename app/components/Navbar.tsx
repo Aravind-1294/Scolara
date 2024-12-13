@@ -81,7 +81,7 @@ export default function Navbar() {
                 Login
               </motion.button>
             </Link>
-            <Link href="/sign-up">
+            <Link href="/Dashboard">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md shadow-blue-200"
