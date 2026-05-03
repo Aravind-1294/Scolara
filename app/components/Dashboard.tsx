@@ -216,18 +216,22 @@ interface DashboardProps {
 
 const formatExamData = (rawData: any) => {
   try {
-    // First try to parse if it's a string
-    let parsedData = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
+    let parsedData = rawData;
     
-    // If it's still a string (double encoded), try parsing again
-    if (typeof parsedData === 'string') {
+    if (typeof rawData === 'string') {
+      // Remove markdown code blocks if Gemini added them
+      let cleanData = rawData.trim();
+      if (cleanData.startsWith('```json')) cleanData = cleanData.substring(7);
+      else if (cleanData.startsWith('```')) cleanData = cleanData.substring(3);
+      if (cleanData.endsWith('```')) cleanData = cleanData.substring(0, cleanData.length - 3);
+      cleanData = cleanData.trim();
+      
       try {
-        parsedData = JSON.parse(parsedData);
+        parsedData = JSON.parse(cleanData);
       } catch (e) {
         // Try to extract JSON from text using regex
-        // Match anything that looks like a JSON array or object
         const jsonRegex = /(\[[\s\S]*\]|\{[\s\S]*\})/;
-        const jsonMatch = parsedData.match(jsonRegex);
+        const jsonMatch = cleanData.match(jsonRegex);
         if (jsonMatch) {
           try {
             parsedData = JSON.parse(jsonMatch[0]);
@@ -237,6 +241,15 @@ const formatExamData = (rawData: any) => {
           }
         } else {
           throw new Error('No valid JSON found in response');
+        }
+      }
+      
+      // If it's still a string (double encoded), parse again
+      if (typeof parsedData === 'string') {
+        try {
+          parsedData = JSON.parse(parsedData);
+        } catch (e) {
+          console.error('Failed to parse double encoded JSON');
         }
       }
     }
