@@ -130,6 +130,29 @@ export default function ChatDashboard() {
     }
   };
 
+  const handleDeleteSession = async (e: React.MouseEvent, sessionId: string) => {
+    e.stopPropagation(); // Prevent triggering the row click
+    if (!confirm('Are you sure you want to delete this document and all its chat history?')) return;
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/chat-sessions/${sessionId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSessions(prev => prev.filter(s => s.id !== sessionId));
+        if (activeSessionId === sessionId) {
+          setActiveSessionId(null);
+        }
+      } else {
+        alert('Failed to delete: ' + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error while deleting');
+    }
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || !activeSessionId || isSending) return;
@@ -330,7 +353,14 @@ export default function ChatDashboard() {
                         </p>
                       </div>
                     </div>
-                    <div className="shrink-0 ml-4">
+                    <div className="shrink-0 ml-4 flex items-center space-x-2">
+                      <button 
+                        onClick={(e) => handleDeleteSession(e, session.id)}
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-colors"
+                        title="Delete Document"
+                      >
+                        <TrashIcon className="w-5 h-5" />
+                      </button>
                       <ArrowLeftIcon className="w-5 h-5 text-gray-400 transform rotate-180" />
                     </div>
                   </div>
