@@ -1,330 +1,334 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useUser } from "@clerk/nextjs";
 import { 
-  PlusIcon, 
-  XMarkIcon, 
-  ArrowUpTrayIcon,
-  DocumentIcon,
-  TrashIcon
+  PlusIcon, XMarkIcon, ArrowUpTrayIcon, DocumentIcon, TrashIcon, 
+  ChatBubbleLeftRightIcon, PaperAirplaneIcon, ArrowLeftIcon 
 } from '@heroicons/react/24/outline';
 
-interface ChatBotData {
+const API_BASE = 'https://web-production-a45d3.up.railway.app';
+
+interface ChatSession {
   id: string;
-  name: string;
-  files: string[];
-  createdAt: Date;
+  pdf_name: string;
+  created_at: string;
 }
 
-interface UploadedFile {
-  name: string;
-  size: number;
-  type: string;
-}
-
-const MAX_FILES = 2;
-const MAX_FILE_SIZE = 1024 * 1024; // 1MB in bytes
-const ALLOWED_FILE_TYPES = ['application/pdf'];
-
-interface FileError {
-  file: string;
-  error: string;
+interface ChatMessage {
+  id?: string;
+  role: 'user' | 'model';
+  content: string;
 }
 
 export default function ChatDashboard() {
-  const [isCreating, setIsCreating] = useState(false);
-  const [chatBots] = useState<ChatBotData[]>([]);
-  const [dragActive, setDragActive] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-  const [fileErrors, setFileErrors] = useState<FileError[]>([]);
+  const { user } = useUser();
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [isLoadingSessions, setIsLoadingSessions] = useState(true);
+  
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const validateFile = (file: File): string | null => {
-    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      return 'Only PDF files are allowed';
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      return 'File size must be less than 1MB';
-    }
-    return null;
-  };
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-  const handleFileUpload = (files: FileList | null) => {
-    if (!files) return;
-    
-    setFileErrors([]); // Clear previous errors
-    
-    // Check if adding new files would exceed the limit
-    if (uploadedFiles.length + files.length > MAX_FILES) {
-      setFileErrors([{ 
-        file: 'Multiple files', 
-        error: `You can only upload up to ${MAX_FILES} files` 
-      }]);
-      return;
-    }
-
-    const newFiles: UploadedFile[] = [];
-    const errors: FileError[] = [];
-
-    Array.from(files).forEach(file => {
-      const error = validateFile(file);
-      if (error) {
-        errors.push({ file: file.name, error });
-      } else {
-        newFiles.push({
-          name: file.name,
-          size: file.size,
-          type: file.type
-        });
+  // Fetch all sessions on mount
+  useEffect(() => {
+    const fetchSessions = async () => {
+      if (!user?.emailAddresses?.[0]?.emailAddress) return;
+      setIsLoadingSessions(true);
+      try {
+        const email = user.emailAddresses[0].emailAddress;
+        const res = await fetch(`${API_BASE}/api/chat-sessions?email=${encodeURIComponent(email)}`);
+        const data = await res.json();
+        if (data.success) {
+          setSessions(data.sessions);
+        }
+      } catch (err) {
+        console.error('Failed to fetch sessions', err);
+      } finally {
+        setIsLoadingSessions(false);
       }
-    });
+    };
+    fetchSessions();
+  }, [user]);
 
-    if (errors.length > 0) {
-      setFileErrors(errors);
+  // Fetch chat history when active session changes
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!activeSessionId) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/chat-history?sessionId=${activeSessionId}`);
+        const data = await res.json();
+        if (data.success) {
+          setMessages(data.messages);
+        }
+      } catch (err) {
+        console.error('Failed to fetch history', err);
+      }
+    };
+    if (activeSessionId) {
+      setMessages([]); // Clear old messages before fetching
+      fetchHistory();
+    }
+  }, [activeSessionId]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    if (file.type !== 'application/pdf') {
+      alert('Only PDF files are allowed');
       return;
     }
-
-    setUploadedFiles(prev => [...prev, ...newFiles]);
-  };
-
-  const removeFile = (fileName: string) => {
-    setUploadedFiles(prev => prev.filter(file => file.name !== fileName));
-  };
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
     
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileUpload(e.dataTransfer.files);
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('userEmail', user?.emailAddresses?.[0]?.emailAddress || '');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/embed-pdf`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Add new session to top of list
+        const newSession: ChatSession = {
+          id: data.sessionId,
+          pdf_name: file.name,
+          created_at: new Date().toISOString()
+        };
+        setSessions([newSession, ...sessions]);
+        setActiveSessionId(data.sessionId);
+      } else {
+        alert('Failed to process PDF: ' + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to upload PDF. Check your backend logs.');
+    } finally {
+      setIsUploading(false);
+      // Reset file input
+      if (e.target) e.target.value = '';
     }
   };
 
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputMessage.trim() || !activeSessionId || isSending) return;
+
+    const messageText = inputMessage.trim();
+    setInputMessage('');
+    
+    // Optimistic UI update
+    const newMessage: ChatMessage = { role: 'user', content: messageText };
+    setMessages(prev => [...prev, newMessage]);
+    setIsSending(true);
+
+    try {
+      const res = await fetch(`${API_BASE}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: activeSessionId,
+          message: messageText
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMessages(prev => [...prev, { role: 'model', content: data.reply }]);
+      } else {
+        alert('Failed to send message: ' + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error while sending message');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  if (activeSessionId) {
+    const activeSession = sessions.find(s => s.id === activeSessionId);
+    return (
+      <div className="flex flex-col h-[calc(100vh-80px)] bg-gray-50 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800">
+        {/* Chat Header */}
+        <div className="flex items-center p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+          <button 
+            onClick={() => setActiveSessionId(null)}
+            className="p-2 mr-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors"
+          >
+            <ArrowLeftIcon className="w-5 h-5" />
+          </button>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+              <DocumentIcon className="w-5 h-5 mr-2 text-blue-500" />
+              {activeSession?.pdf_name || 'Document Chat'}
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Ask questions about this PDF</p>
+          </div>
+        </div>
+
+        {/* Chat Messages Area */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+          {messages.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <ChatBubbleLeftRightIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">PDF Processed Successfully!</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-md">
+                  I have read the document. You can now ask me any questions about its contents.
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div 
+                className={`max-w-[80%] rounded-2xl px-5 py-3 shadow-sm ${
+                  msg.role === 'user' 
+                    ? 'bg-blue-600 text-white rounded-tr-none' 
+                    : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700 rounded-tl-none'
+                }`}
+              >
+                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                  {msg.content}
+                </div>
+              </div>
+            </div>
+          ))}
+          {isSending && (
+            <div className="flex justify-start">
+              <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl rounded-tl-none px-5 py-4 shadow-sm flex space-x-2 items-center">
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Chat Input */}
+        <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+          <form onSubmit={handleSendMessage} className="relative flex items-center max-w-4xl mx-auto">
+            <input
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Ask anything about this document..."
+              disabled={isSending}
+              className="w-full bg-gray-100 dark:bg-gray-900 border-none rounded-full pl-6 pr-14 py-4 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={!inputMessage.trim() || isSending}
+              className="absolute right-2 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              <PaperAirplaneIcon className="w-5 h-5 -mt-0.5 ml-0.5" />
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Dashboard / Library View
   return (
-    <div className="p-8">
-      {/* Header section - Always visible */}
+    <div className="p-6 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Chat with Your Data</h1>
-          <p className="text-gray-600 mt-1">
-            Create custom AI chatbots trained on your documents. Upload PDFs, text files, or documents 
-            to build a knowledge base for your chatbot.
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">ExamChat</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Upload any PDF to instantly chat with it, ask questions, and extract insights.
           </p>
         </div>
       </div>
 
-      {isCreating ? (
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="border-b border-gray-200">
-            <div className="px-6 py-4 flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-gray-900">Create New Chatbot</h2>
-              <button
-                onClick={() => setIsCreating(false)}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <XMarkIcon className="w-5 h-5 text-gray-500" />
-              </button>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Upload Card */}
+        <div className="lg:col-span-1">
+          <label className="block cursor-pointer h-[240px] bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-blue-300 dark:border-blue-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 overflow-hidden group">
+            <input 
+              type="file" 
+              accept=".pdf" 
+              className="hidden" 
+              onChange={handleFileUpload}
+              disabled={isUploading}
+            />
+            <div className="flex flex-col items-center justify-center h-full p-6 text-center group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors duration-300">
+              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                {isUploading ? (
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
+                ) : (
+                  <ArrowUpTrayIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                )}
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                {isUploading ? 'Processing PDF...' : 'Upload New PDF'}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {isUploading ? 'Chunking and reading document...' : 'Click to browse. PDF files only.'}
+              </p>
             </div>
-          </div>
+          </label>
+        </div>
 
-          <div className="p-6">
-            {uploadedFiles.length === 0 ? (
-              <div
-                className={`relative group ${
-                  dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                } border-2 border-dashed rounded-xl transition-all duration-300`}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-              >
-                <div className="p-12">
-                  <div className="text-center">
-                    {/* Upload icon */}
-                    <div className="mx-auto h-20 w-20 rounded-full bg-blue-50 flex items-center justify-center mb-6">
-                      <ArrowUpTrayIcon className="h-10 w-10 text-blue-600" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        Upload your documents
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Drag and drop your files here, or click to browse
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        Upload up to 2 PDF files (Max size: 1MB each)
-                      </p>
-                    </div>
-
-                    {/* File input button */}
-                    <div className="mt-8">
-                      <label className="inline-flex items-center px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer">
-                        <span className="text-sm font-medium">Browse files</span>
-                        <input
-                          type="file"
-                          className="hidden"
-                          multiple
-                          accept=".pdf"
-                          onChange={(e) => handleFileUpload(e.target.files)}
-                        />
-                      </label>
-                    </div>
-
-                    {/* Error Messages */}
-                    {fileErrors.length > 0 && (
-                      <div className="mt-4">
-                        {fileErrors.map((error, index) => (
-                          <div key={index} className="text-sm text-red-600">
-                            {error.file}: {error.error}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
+        {/* Library Card */}
+        <div className="lg:col-span-2">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 h-full min-h-[300px]">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+              <DocumentIcon className="w-5 h-5 mr-2 text-gray-500" />
+              Your Document Library
+            </h3>
+            
+            {isLoadingSessions ? (
+              <div className="flex justify-center items-center h-40">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            ) : sessions.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-40 text-gray-500 dark:text-gray-400 space-y-3">
+                <DocumentIcon className="w-10 h-10 opacity-50" />
+                <p>No documents uploaded yet. Upload a PDF to get started!</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    Uploaded Files ({uploadedFiles.length}/{MAX_FILES})
-                  </h3>
-                  {uploadedFiles.length < MAX_FILES && (
-                    <label className="inline-flex items-center px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer">
-                      <PlusIcon className="w-5 h-5 mr-2" />
-                      <span className="text-sm font-medium">Add More Files</span>
-                      <input
-                        type="file"
-                        className="hidden"
-                        multiple
-                        accept=".pdf"
-                        onChange={(e) => handleFileUpload(e.target.files)}
-                      />
-                    </label>
-                  )}
-                </div>
-
-                {/* File List */}
-                <div className="bg-gray-50 rounded-lg border border-gray-200">
-                  {uploadedFiles.map((file, index) => (
-                    <div 
-                      key={file.name + index}
-                      className={`flex items-center justify-between p-4 ${
-                        index !== uploadedFiles.length - 1 ? 'border-b border-gray-200' : ''
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-blue-50 rounded">
-                          <DocumentIcon className="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                          <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => removeFile(file.name)}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                      >
-                        <TrashIcon className="w-5 h-5 text-gray-400 hover:text-red-500" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Error Messages */}
-                {fileErrors.length > 0 && (
-                  <div className="mt-4 p-4 bg-red-50 rounded-lg">
-                    {fileErrors.map((error, index) => (
-                      <div key={index} className="text-sm text-red-600">
-                        {error.file}: {error.error}
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Create Bot Button */}
-                <div className="flex justify-end mt-6">
-                  <button
-                    onClick={() => {
-                      console.log('Creating bot with files:', uploadedFiles);
-                    }}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              <div className="space-y-3">
+                {sessions.map((session) => (
+                  <div 
+                    key={session.id}
+                    onClick={() => setActiveSessionId(session.id)}
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer transition-all duration-200"
                   >
-                    Create Bot
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {uploadedFiles.length === 0 && (
-              <div className="mt-8">
-                <h4 className="text-sm font-medium text-gray-900 mb-4">Guidelines:</h4>
-                <ul className="space-y-2 text-sm text-gray-500">
-                  <li className="flex items-center">
-                    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></span>
-                    Upload multiple files to create a comprehensive knowledge base
-                  </li>
-                  <li className="flex items-center">
-                    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></span>
-                    Files should be text-based and readable
-                  </li>
-                  <li className="flex items-center">
-                    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></span>
-                    Ensure documents contain relevant information for your chatbot
-                  </li>
-                </ul>
+                    <div className="flex items-center space-x-4 overflow-hidden">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg shrink-0">
+                        <DocumentIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="truncate">
+                        <h4 className="font-medium text-gray-900 dark:text-white truncate">{session.pdf_name}</h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          {new Date(session.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="shrink-0 ml-4">
+                      <ArrowLeftIcon className="w-5 h-5 text-gray-400 transform rotate-180" />
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
         </div>
-      ) : (
-        // Regular dashboard view
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Create New Bot Card */}
-          <div 
-            onClick={() => setIsCreating(true)} 
-            className="group cursor-pointer"
-          >
-            <div className="relative h-[200px] bg-white rounded-2xl border-2 border-dashed border-gray-200 hover:border-blue-500 transition-all duration-300 overflow-hidden">
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center group-hover:bg-blue-50 transition-colors duration-300">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <PlusIcon className="w-8 h-8 text-blue-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Create New Bot</h3>
-                <p className="text-sm text-gray-500">
-                  Upload your documents to create a custom AI chatbot
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Existing Chatbots */}
-          {chatBots.map((bot) => (
-            <div key={bot.id} className="h-[200px] bg-white rounded-2xl border border-gray-200 p-6">
-              {/* Bot card content */}
-            </div>
-          ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 }

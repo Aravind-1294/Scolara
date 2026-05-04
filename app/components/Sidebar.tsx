@@ -50,9 +50,7 @@ const sidebarOptions: SidebarOption[] = [
   { 
     id: 'chat', 
     name: 'ExamChat', 
-    icon: ChatBubbleLeftRightIcon,
-    disabled: true,
-    tag: 'Coming soon'
+    icon: ChatBubbleLeftRightIcon
   },
   
   // Bottom actions
