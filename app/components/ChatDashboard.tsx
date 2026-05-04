@@ -20,6 +20,17 @@ interface ChatMessage {
   content: string;
 }
 
+const parseMarkdown = (text: string) => {
+  // Split by bold (**text**), lists (* text), or newlines
+  return text.split(/(\*\*.*?\*\*|\n)/g).map((part, index) => {
+    if (part === '\n') return <br key={index} />;
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={index} className="font-bold text-gray-900 dark:text-white">{part.slice(2, -2)}</strong>;
+    }
+    return <span key={index}>{part}</span>;
+  });
+};
+
 export default function ChatDashboard() {
   const { user } = useUser();
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -201,7 +212,7 @@ export default function ChatDashboard() {
                 }`}
               >
                 <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                  {msg.content}
+                  {msg.role === 'model' ? parseMarkdown(msg.content) : msg.content}
                 </div>
               </div>
             </div>
